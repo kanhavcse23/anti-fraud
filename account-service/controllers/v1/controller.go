@@ -35,6 +35,12 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 		http.Error(w, "Error decoding request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+	err = accountReq.Validate()
+	if err != nil {
+		controller.logger.Warningf("Error: %v", err)
+		http.Error(w, "Error: "+err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	tx := controller.db.Begin()
 	defer tx.Rollback()
