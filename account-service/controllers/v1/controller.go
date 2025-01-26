@@ -5,6 +5,7 @@ import (
 	entityHttpV1Package "anti-fraud/account-service/entity/http/v1"
 	mapperV1Package "anti-fraud/account-service/mapper/v1"
 	repoV1Package "anti-fraud/account-service/repository/v1"
+	"strconv"
 
 	"github.com/sirupsen/logrus"
 
@@ -70,9 +71,15 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 func (controller *AccountController) GetAccountDetails(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
-	accountId := params["accountId"]
+	accountIdStr := params["accountId"]
+	controller.logger.Infof("GetAccountDetails endpoint called for accountId: %v", accountIdStr)
 
-	controller.logger.Infof("GetAccountDetails endpoint called for accountId: %v", accountId)
+	accountId, err := strconv.Atoi(accountIdStr)
+	if err != nil {
+		controller.logger.Errorf("Error converting string to int: %v\n", err)
+		http.Error(w, "Error converting string to int: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	tx := controller.db.Begin()
 	defer tx.Rollback()

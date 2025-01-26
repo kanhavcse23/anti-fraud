@@ -5,7 +5,9 @@ import (
 	entityDbV1Package "anti-fraud/transaction-service/entity/db/v1"
 	mapperV1Package "anti-fraud/transaction-service/mapper/v1"
 	repoV1Package "anti-fraud/transaction-service/repository/v1"
+	"fmt"
 
+	accountClientPackageV1 "anti-fraud/mediator-service/account-service-client"
 	operationClientPackageV1 "anti-fraud/mediator-service/operation-service-client"
 
 	"math"
@@ -18,10 +20,11 @@ type TransactionCore struct {
 	repoV1          *repoV1Package.TransactionRepository
 	logger          *logrus.Logger
 	operationClient *operationClientPackageV1.OperationClient
+	accountClient   *accountClientPackageV1.AccountClient
 }
 
-func NewTransactionCore(repoV1 *repoV1Package.TransactionRepository, logger *logrus.Logger, operationClient *operationClientPackageV1.OperationClient) *TransactionCore {
-	return &TransactionCore{repoV1: repoV1, logger: logger, operationClient: operationClient}
+func NewTransactionCore(repoV1 *repoV1Package.TransactionRepository, logger *logrus.Logger, operationClient *operationClientPackageV1.OperationClient, accountClient *accountClientPackageV1.AccountClient) *TransactionCore {
+	return &TransactionCore{repoV1: repoV1, logger: logger, operationClient: operationClient, accountClient: accountClient}
 }
 
 func (core *TransactionCore) FinalTransactionAmount(amount float64, operationTypeID int, tx *gorm.DB) (float64, error) {
@@ -32,13 +35,27 @@ func (core *TransactionCore) FinalTransactionAmount(amount float64, operationTyp
 	}
 	return (math.Abs(amount) * float64(coef)), nil
 }
+func (core *TransactionCore) CheckAccountIdExist(accountId int, tx *gorm.DB) (bool, error) {
+
+	account, err := core.accountClient.GetAccount(accountId, tx)
+	if err != nil {
+		return false, err
+	}
+	return (account.Id > 0), err
+}
 
 func (core *TransactionCore) CreateTransaction(transactionPayload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error) {
 	core.logger.Info("CreateTransaction method called in transaction core layer.")
+	accountFound, err := core.CheckAccountIdExist(transactionPayload.AccountId, tx)
+	if err != nil {
+		return &entityDbV1Package.Transaction{}, err
+	}
+	if !accountFound {
+		return &entityDbV1Package.Transaction{}, fmt.Errorf("account_id: %d not found in database", transactionPayload.AccountId)
+	}
 	transaction := mapperV1Package.TransactionMapper(transactionPayload)
 	amount, err := core.FinalTransactionAmount(transaction.Amount, transaction.OperationTypeId, tx)
 	if err != nil {
-
 		return transaction, err
 	}
 	transaction.Amount = amount

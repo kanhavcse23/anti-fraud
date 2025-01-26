@@ -11,6 +11,8 @@ import (
 	operationClientV1Package "anti-fraud/mediator-service/operation-service-client"
 	dbConnPackage "anti-fraud/utils-server/utils/v1"
 
+	accountClientV1Package "anti-fraud/mediator-service/account-service-client"
+
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
@@ -31,12 +33,15 @@ func main() {
 
 	//Operation Client
 	operationClient := operationClientV1Package.NewOperationClient()
+	//Operation Client
+	accountClient := accountClientV1Package.NewAccountClient()
 	//configure account service
 	accountMiddlewareV1 := account_middleware_v1.NewAccountMiddleware(db, router, logger)
 	accountMiddlewareV1.Init()
+	accountMiddlewareV1.ConfigureClient(accountClient)
 
 	//configure transaction service
-	transactionMiddlewareV1 := transaction_middleware_v1.NewTransactionMiddleware(db, router, logger, operationClient)
+	transactionMiddlewareV1 := transaction_middleware_v1.NewTransactionMiddleware(db, router, logger, operationClient, accountClient)
 	transactionMiddlewareV1.Init()
 
 	//configure operation service

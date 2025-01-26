@@ -6,8 +6,9 @@ import (
 	repoV1Package "anti-fraud/transaction-service/repository/v1"
 	routerV1Package "anti-fraud/transaction-service/routes/v1"
 
+	accountClientV1Package "anti-fraud/mediator-service/account-service-client"
 	operationClientV1Package "anti-fraud/mediator-service/operation-service-client"
-	middlewareHandlerV1Package "anti-fraud/utils-server/middleware/v1"
+	middlewareHandlerPackageV1 "anti-fraud/utils-server/middleware/v1"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -19,18 +20,19 @@ type TransactionMiddleware struct {
 	router          *mux.Router
 	logger          *logrus.Logger
 	operationClient *operationClientV1Package.OperationClient
+	accountClient   *accountClientV1Package.AccountClient
 }
 
-func NewTransactionMiddleware(db *gorm.DB, router *mux.Router, logger *logrus.Logger, operationClient *operationClientV1Package.OperationClient) *TransactionMiddleware {
+func NewTransactionMiddleware(db *gorm.DB, router *mux.Router, logger *logrus.Logger, operationClient *operationClientV1Package.OperationClient, accountClient *accountClientV1Package.AccountClient) *TransactionMiddleware {
 
-	return &TransactionMiddleware{db: db, router: router, logger: logger, operationClient: operationClient}
+	return &TransactionMiddleware{db: db, router: router, logger: logger, operationClient: operationClient, accountClient: accountClient}
 }
 
 func (mw *TransactionMiddleware) Init() {
 
-	middlewareHandler := middlewareHandlerV1Package.NewMiddlewareHandler(mw.logger)
+	middlewareHandler := middlewareHandlerPackageV1.NewMiddlewareHandler(mw.logger)
 	repoV1 := repoV1Package.NewTransactionRepository(mw.logger)
-	coreV1 := coreV1Package.NewTransactionCore(repoV1, mw.logger, mw.operationClient)
+	coreV1 := coreV1Package.NewTransactionCore(repoV1, mw.logger, mw.operationClient, mw.accountClient)
 	controllerV1 := controllerV1Package.NewTransactionController(repoV1, coreV1, mw.db, mw.logger)
 	router := routerV1Package.NewTransactionRoutes(controllerV1, mw.router, middlewareHandler)
 	router.Init()

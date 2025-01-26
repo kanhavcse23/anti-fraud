@@ -22,5 +22,5 @@ func NewTransactionRoutes(controller *controllerV1Package.TransactionController,
 func (routes *TransactionRoutes) Init() {
 	handlerFunc := routes.middlewareHandler.MiddlewareHandlerFunc
 
-	routes.muxRouter.HandleFunc("/transactions", handlerFunc(routes.controller.CreateTransaction)).Methods("POST")
+	routes.muxRouter.HandleFunc("/transactions/v1", handlerFunc(routes.controller.CreateTransaction)).Methods("POST")
 }
