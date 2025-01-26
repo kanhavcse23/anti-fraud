@@ -1,4 +1,4 @@
-package mapper_v1
+package account_mapper_v1
 
 import (
 	entityCoreV1Path "anti-fraud/account-service/entity/core/v1"

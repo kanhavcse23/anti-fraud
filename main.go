@@ -2,11 +2,13 @@ package main
 
 import (
 	account_middleware_v1 "anti-fraud/account-service/middleware/v1"
+	operation_middleware_v1 "anti-fraud/operation-service/middleware/v1"
 	transaction_middleware_v1 "anti-fraud/transaction-service/middleware/v1"
 	"fmt"
 	"log"
 	"net/http"
 
+	operationClientPathV1 "anti-fraud/mediator-service/operation-service-client"
 	dbConnPath "anti-fraud/utils-server/utils/v1"
 
 	"github.com/gorilla/mux"
@@ -25,12 +27,22 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// Configure Client
 
+	//Operation Client
+	operationClient := operationClientPathV1.NewOperationClient()
+	//configure account service
 	accountMiddlewareV1 := account_middleware_v1.NewAccountMiddleware(db, router, logger)
 	accountMiddlewareV1.Init()
 
-	transactionMiddlewareV1 := transaction_middleware_v1.NewTransactionMiddleware(db, router, logger)
+	//configure transaction service
+	transactionMiddlewareV1 := transaction_middleware_v1.NewTransactionMiddleware(db, router, logger, operationClient)
 	transactionMiddlewareV1.Init()
+
+	//configure operation service
+	operationMiddlewareV1 := operation_middleware_v1.NewOperationMiddleware(logger)
+	operationMiddlewareV1.Init()
+	operationMiddlewareV1.ConfigureClient(operationClient)
 
 	logger.Errorf("All components has been wired.")
 
