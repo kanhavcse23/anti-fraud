@@ -1,12 +1,10 @@
 package transaction_repo_v1
 
 import (
+	constantPackage "anti-fraud/constants/transaction"
 	entityDbV1Package "anti-fraud/transaction-service/entity/db/v1"
 
-	constantPackage "anti-fraud/constants/transaction"
-
 	"github.com/sirupsen/logrus"
-
 	"gorm.io/gorm"
 )
 
