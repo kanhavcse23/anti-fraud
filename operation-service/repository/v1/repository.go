@@ -3,6 +3,7 @@ package operation_repo_v1
 import (
 	constantPackage "anti-fraud/constants/operation"
 	entityDbV1Package "anti-fraud/operation-service/entity/db/v1"
+	"fmt"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -21,7 +22,7 @@ func (repo *OperationRepository) GetOperation(operationId int, tx *gorm.DB) (*en
 	var operation entityDbV1Package.Operation
 	result := tx.Table(constantPackage.TABLE_NAME).First(&operation, operationId)
 	if result.Error != nil && result.Error == gorm.ErrRecordNotFound {
-		return &operation, nil
+		return &operation, fmt.Errorf("operation id: %d not found in database", operationId)
 	}
 	return &operation, result.Error
 }

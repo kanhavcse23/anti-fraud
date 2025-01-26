@@ -35,23 +35,24 @@ func (core *TransactionCore) FinalTransactionAmount(amount float64, operationTyp
 	}
 	return (math.Abs(amount) * float64(coef)), nil
 }
-func (core *TransactionCore) CheckAccountIdExist(accountId int, tx *gorm.DB) (bool, error) {
+func (core *TransactionCore) CheckAccountIdExist(accountId int, tx *gorm.DB) error {
 
 	account, err := core.accountClient.GetAccount(accountId, tx)
 	if err != nil {
-		return false, err
+		return err
 	}
-	return (account.Id > 0), err
+	if account.Id == 0 {
+
+		return fmt.Errorf("account_id: %d not found in database", accountId)
+	}
+	return nil
 }
 
 func (core *TransactionCore) CreateTransaction(transactionPayload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error) {
 	core.logger.Info("CreateTransaction method called in transaction core layer.")
-	accountFound, err := core.CheckAccountIdExist(transactionPayload.AccountId, tx)
+	err := core.CheckAccountIdExist(transactionPayload.AccountId, tx)
 	if err != nil {
 		return &entityDbV1Package.Transaction{}, err
-	}
-	if !accountFound {
-		return &entityDbV1Package.Transaction{}, fmt.Errorf("account_id: %d not found in database", transactionPayload.AccountId)
 	}
 	transaction := mapperV1Package.TransactionMapper(transactionPayload)
 	amount, err := core.FinalTransactionAmount(transaction.Amount, transaction.OperationTypeId, tx)
