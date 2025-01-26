@@ -1,20 +1,20 @@
 package transaction_route_v1
 
 import (
-	controllerV1Path "anti-fraud/transaction-service/controllers/v1"
+	controllerV1Package "anti-fraud/transaction-service/controllers/v1"
 
-	middlewareHandlerPathV1 "anti-fraud/utils-server/middleware/v1"
+	middlewareHandlerPackageV1 "anti-fraud/utils-server/middleware/v1"
 
 	"github.com/gorilla/mux"
 )
 
 type TransactionRoutes struct {
-	controller        *controllerV1Path.TransactionController
+	controller        *controllerV1Package.TransactionController
 	muxRouter         *mux.Router
-	middlewareHandler *middlewareHandlerPathV1.MiddlewareHandler
+	middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler
 }
 
-func NewTransactionRoutes(controller *controllerV1Path.TransactionController, router *mux.Router, middlewareHandler *middlewareHandlerPathV1.MiddlewareHandler) *TransactionRoutes {
+func NewTransactionRoutes(controller *controllerV1Package.TransactionController, router *mux.Router, middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler) *TransactionRoutes {
 	return &TransactionRoutes{controller: controller, muxRouter: router, middlewareHandler: middlewareHandler}
 
 }

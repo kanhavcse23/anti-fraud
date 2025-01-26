@@ -1,7 +1,7 @@
 package utils_db
 
 import (
-	configPath "anti-fraud/utils-server/config"
+	configPackage "anti-fraud/utils-server/config"
 
 	"fmt"
 
@@ -12,7 +12,7 @@ import (
 
 func EstablishPostgresqlDBConnection() (*gorm.DB, error) {
 
-	config, err := configPath.LoadConfig()
+	config, err := configPackage.LoadConfig()
 	if err != nil {
 		return nil, err
 	}

@@ -1,9 +1,9 @@
 package account_repo_v1
 
 import (
-	entityDbV1Path "anti-fraud/account-service/entity/db/v1"
+	entityDbV1Package "anti-fraud/account-service/entity/db/v1"
 
-	constantPath "anti-fraud/constants/account"
+	constantPackage "anti-fraud/constants/account"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -16,15 +16,15 @@ type AccountRepository struct {
 func NewAccountRepository(logger *logrus.Logger) *AccountRepository {
 	return &AccountRepository{logger: logger}
 }
-func (repo *AccountRepository) CreateAccount(account *entityDbV1Path.Account, tx *gorm.DB) error {
+func (repo *AccountRepository) CreateAccount(account *entityDbV1Package.Account, tx *gorm.DB) error {
 	repo.logger.Info("CreateAccount method called in account repo layer.")
-	result := tx.Table(constantPath.TABLE_NAME).Create(account)
+	result := tx.Table(constantPackage.TABLE_NAME).Create(account)
 	return result.Error
 }
-func (repo *AccountRepository) GetAccount(accountId string, tx *gorm.DB) (*entityDbV1Path.Account, error) {
+func (repo *AccountRepository) GetAccount(accountId string, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	repo.logger.Info("GetAccount method called in account repo layer.")
-	var account entityDbV1Path.Account
-	result := tx.Table(constantPath.TABLE_NAME).First(&account, accountId)
+	var account entityDbV1Package.Account
+	result := tx.Table(constantPackage.TABLE_NAME).First(&account, accountId)
 	if result.Error != nil && result.Error == gorm.ErrRecordNotFound {
 		return &account, nil
 	}

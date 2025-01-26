@@ -8,8 +8,8 @@ import (
 	"log"
 	"net/http"
 
-	operationClientPathV1 "anti-fraud/mediator-service/operation-service-client"
-	dbConnPath "anti-fraud/utils-server/utils/v1"
+	operationClientV1Package "anti-fraud/mediator-service/operation-service-client"
+	dbConnPackage "anti-fraud/utils-server/utils/v1"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -23,14 +23,14 @@ func main() {
 
 	router := mux.NewRouter()
 
-	db, err := dbConnPath.EstablishPostgresqlDBConnection()
+	db, err := dbConnPackage.EstablishPostgresqlDBConnection()
 	if err != nil {
 		log.Fatal(err)
 	}
 	// Configure Client
 
 	//Operation Client
-	operationClient := operationClientPathV1.NewOperationClient()
+	operationClient := operationClientV1Package.NewOperationClient()
 	//configure account service
 	accountMiddlewareV1 := account_middleware_v1.NewAccountMiddleware(db, router, logger)
 	accountMiddlewareV1.Init()

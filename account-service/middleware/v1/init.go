@@ -1,12 +1,12 @@
 package account_middleware_v1
 
 import (
-	controllerV1Path "anti-fraud/account-service/controllers/v1"
-	coreV1Path "anti-fraud/account-service/core/v1"
-	repoV1Path "anti-fraud/account-service/repository/v1"
-	routerV1Path "anti-fraud/account-service/routes/v1"
+	controllerV1Package "anti-fraud/account-service/controllers/v1"
+	coreV1Package "anti-fraud/account-service/core/v1"
+	repoV1Package "anti-fraud/account-service/repository/v1"
+	routerV1Package "anti-fraud/account-service/routes/v1"
 
-	middlewareHandlerPathV1 "anti-fraud/utils-server/middleware/v1"
+	middlewareHandlerPackageV1 "anti-fraud/utils-server/middleware/v1"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -26,10 +26,10 @@ func NewAccountMiddleware(db *gorm.DB, router *mux.Router, logger *logrus.Logger
 
 func (mw *AccountMiddleware) Init() {
 
-	middlewareHandler := middlewareHandlerPathV1.NewMiddlewareHandler(mw.logger)
-	repoV1 := repoV1Path.NewAccountRepository(mw.logger)
-	coreV1 := coreV1Path.NewAccountCore(repoV1, mw.logger)
-	controllerV1 := controllerV1Path.NewAccountController(repoV1, coreV1, mw.db, mw.logger)
-	router := routerV1Path.NewAccountRoutes(controllerV1, mw.router, middlewareHandler)
+	middlewareHandler := middlewareHandlerPackageV1.NewMiddlewareHandler(mw.logger)
+	repoV1 := repoV1Package.NewAccountRepository(mw.logger)
+	coreV1 := coreV1Package.NewAccountCore(repoV1, mw.logger)
+	controllerV1 := controllerV1Package.NewAccountController(repoV1, coreV1, mw.db, mw.logger)
+	router := routerV1Package.NewAccountRoutes(controllerV1, mw.router, middlewareHandler)
 	router.Init()
 }

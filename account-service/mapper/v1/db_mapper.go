@@ -1,12 +1,12 @@
 package account_mapper_v1
 
 import (
-	entityCoreV1Path "anti-fraud/account-service/entity/core/v1"
-	entityDbV1Path "anti-fraud/account-service/entity/db/v1"
+	entityCoreV1Package "anti-fraud/account-service/entity/core/v1"
+	entityDbV1Package "anti-fraud/account-service/entity/db/v1"
 )
 
-func AccountMapper(accountPayload *entityCoreV1Path.CreateAccountPayload) *entityDbV1Path.Account {
-	return &entityDbV1Path.Account{
+func AccountMapper(accountPayload *entityCoreV1Package.CreateAccountPayload) *entityDbV1Package.Account {
+	return &entityDbV1Package.Account{
 		DocumentNumber: accountPayload.DocumentNumber,
 	}
 }

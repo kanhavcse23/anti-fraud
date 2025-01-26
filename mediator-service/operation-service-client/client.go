@@ -1,21 +1,21 @@
 package mediator_ops_client_v1
 
 import (
-	controllerV1Path "anti-fraud/operation-service/core/v1"
+	controllerV1Package "anti-fraud/operation-service/core/v1"
 	"fmt"
 
 	"gorm.io/gorm"
 )
 
 type OperationClient struct {
-	operationCoreV1 *controllerV1Path.OperationCore
+	operationCoreV1 *controllerV1Package.OperationCore
 }
 
 func NewOperationClient() *OperationClient {
 
 	return &OperationClient{}
 }
-func (client *OperationClient) SetupCore(operationCoreV1 *controllerV1Path.OperationCore) {
+func (client *OperationClient) SetupCore(operationCoreV1 *controllerV1Package.OperationCore) {
 	fmt.Println("val.value:", operationCoreV1)
 	client.operationCoreV1 = operationCoreV1
 	fmt.Println("val.value:", client.operationCoreV1)

@@ -1,20 +1,20 @@
 package account_route_v1
 
 import (
-	controllerV1Path "anti-fraud/account-service/controllers/v1"
+	controllerV1Package "anti-fraud/account-service/controllers/v1"
 
-	middlewareHandlerPathV1 "anti-fraud/utils-server/middleware/v1"
+	middlewareHandlerPackageV1 "anti-fraud/utils-server/middleware/v1"
 
 	"github.com/gorilla/mux"
 )
 
 type AccountRoutes struct {
-	controller        *controllerV1Path.AccountController
+	controller        *controllerV1Package.AccountController
 	muxRouter         *mux.Router
-	middlewareHandler *middlewareHandlerPathV1.MiddlewareHandler
+	middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler
 }
 
-func NewAccountRoutes(controller *controllerV1Path.AccountController, router *mux.Router, middlewareHandler *middlewareHandlerPathV1.MiddlewareHandler) *AccountRoutes {
+func NewAccountRoutes(controller *controllerV1Package.AccountController, router *mux.Router, middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler) *AccountRoutes {
 	return &AccountRoutes{controller: controller, muxRouter: router, middlewareHandler: middlewareHandler}
 
 }

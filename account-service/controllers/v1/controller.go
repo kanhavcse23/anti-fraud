@@ -1,10 +1,10 @@
 package account_controller_v1
 
 import (
-	coreV1Path "anti-fraud/account-service/core/v1"
-	entityHttpV1Path "anti-fraud/account-service/entity/http/v1"
-	mapperV1Path "anti-fraud/account-service/mapper/v1"
-	repoV1Path "anti-fraud/account-service/repository/v1"
+	coreV1Package "anti-fraud/account-service/core/v1"
+	entityHttpV1Package "anti-fraud/account-service/entity/http/v1"
+	mapperV1Package "anti-fraud/account-service/mapper/v1"
+	repoV1Package "anti-fraud/account-service/repository/v1"
 
 	"github.com/sirupsen/logrus"
 
@@ -16,19 +16,19 @@ import (
 )
 
 type AccountController struct {
-	repoV1 *repoV1Path.AccountRepository
-	coreV1 *coreV1Path.AccountCore
+	repoV1 *repoV1Package.AccountRepository
+	coreV1 *coreV1Package.AccountCore
 	db     *gorm.DB
 	logger *logrus.Logger
 }
 
-func NewAccountController(repoV1 *repoV1Path.AccountRepository, coreV1 *coreV1Path.AccountCore, db *gorm.DB, logger *logrus.Logger) *AccountController {
+func NewAccountController(repoV1 *repoV1Package.AccountRepository, coreV1 *coreV1Package.AccountCore, db *gorm.DB, logger *logrus.Logger) *AccountController {
 	return &AccountController{repoV1: repoV1, coreV1: coreV1, db: db, logger: logger}
 }
 
 func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	controller.logger.Info("CreateAccount endpoint called")
-	var accountReq entityHttpV1Path.CreateAccountRequest
+	var accountReq entityHttpV1Package.CreateAccountRequest
 	err := json.NewDecoder(r.Body).Decode(&accountReq)
 	if err != nil {
 		controller.logger.Warningf("Error decoding request body: %v", err)
@@ -45,7 +45,7 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 	tx := controller.db.Begin()
 	defer tx.Rollback()
 
-	account, err := controller.coreV1.CreateAccount(mapperV1Path.CreateAccountPayloadMapper(&accountReq), tx)
+	account, err := controller.coreV1.CreateAccount(mapperV1Package.CreateAccountPayloadMapper(&accountReq), tx)
 	if err != nil {
 		controller.logger.Errorf("Error creating account: %v", err)
 		http.Error(w, "An internal error occurred"+err.Error(), http.StatusInternalServerError)
@@ -60,7 +60,7 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 	controller.logger.Infof("Account created successfully: %v", account)
 	response := map[string]interface{}{
 		"success": true,
-		"account": mapperV1Path.AccountDetailsResponseMapper(account),
+		"account": mapperV1Package.AccountDetailsResponseMapper(account),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -91,7 +91,7 @@ func (controller *AccountController) GetAccountDetails(w http.ResponseWriter, r 
 
 	response := map[string]interface{}{
 		"success": true,
-		"account": mapperV1Path.AccountDetailsResponseMapper(account),
+		"account": mapperV1Package.AccountDetailsResponseMapper(account),
 	}
 
 	w.Header().Set("Content-Type", "application/json")

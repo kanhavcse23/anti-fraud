@@ -1,13 +1,13 @@
 package transaction_core_v1
 
 import (
-	entityCoreV1Path "anti-fraud/transaction-service/entity/core/v1"
-	entityDbV1Path "anti-fraud/transaction-service/entity/db/v1"
-	mapperV1Path "anti-fraud/transaction-service/mapper/v1"
-	repoV1Path "anti-fraud/transaction-service/repository/v1"
+	entityCoreV1Package "anti-fraud/transaction-service/entity/core/v1"
+	entityDbV1Package "anti-fraud/transaction-service/entity/db/v1"
+	mapperV1Package "anti-fraud/transaction-service/mapper/v1"
+	repoV1Package "anti-fraud/transaction-service/repository/v1"
 	"fmt"
 
-	operationClientPathV1 "anti-fraud/mediator-service/operation-service-client"
+	operationClientPackageV1 "anti-fraud/mediator-service/operation-service-client"
 
 	"math"
 
@@ -16,12 +16,12 @@ import (
 )
 
 type TransactionCore struct {
-	repoV1          *repoV1Path.TransactionRepository
+	repoV1          *repoV1Package.TransactionRepository
 	logger          *logrus.Logger
-	operationClient *operationClientPathV1.OperationClient
+	operationClient *operationClientPackageV1.OperationClient
 }
 
-func NewTransactionCore(repoV1 *repoV1Path.TransactionRepository, logger *logrus.Logger, operationClient *operationClientPathV1.OperationClient) *TransactionCore {
+func NewTransactionCore(repoV1 *repoV1Package.TransactionRepository, logger *logrus.Logger, operationClient *operationClientPackageV1.OperationClient) *TransactionCore {
 	return &TransactionCore{repoV1: repoV1, logger: logger, operationClient: operationClient}
 }
 
@@ -35,9 +35,9 @@ func (core *TransactionCore) FinalTransactionAmount(amount float64, operationTyp
 	return (math.Abs(amount) * float64(coef)), nil
 }
 
-func (core *TransactionCore) CreateTransaction(transactionPayload *entityCoreV1Path.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Path.Transaction, error) {
+func (core *TransactionCore) CreateTransaction(transactionPayload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error) {
 	core.logger.Info("CreateTransaction method called in transaction core layer.")
-	transaction := mapperV1Path.TransactionMapper(transactionPayload)
+	transaction := mapperV1Package.TransactionMapper(transactionPayload)
 	amount, err := core.FinalTransactionAmount(transaction.Amount, transaction.OperationTypeId, tx)
 	if err != nil {
 
