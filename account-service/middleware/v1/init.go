@@ -6,7 +6,7 @@ import (
 	repoV1Package "anti-fraud/account-service/repository/v1"
 	routerV1Package "anti-fraud/account-service/routes/v1"
 
-	middlewareHandlerPackageV1 "anti-fraud/utils-server/middleware/v1"
+	middlewareHandlerV1Package "anti-fraud/utils-server/middleware/v1"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -26,7 +26,7 @@ func NewAccountMiddleware(db *gorm.DB, router *mux.Router, logger *logrus.Logger
 
 func (mw *AccountMiddleware) Init() {
 
-	middlewareHandler := middlewareHandlerPackageV1.NewMiddlewareHandler(mw.logger)
+	middlewareHandler := middlewareHandlerV1Package.NewMiddlewareHandler(mw.logger)
 	repoV1 := repoV1Package.NewAccountRepository(mw.logger)
 	coreV1 := coreV1Package.NewAccountCore(repoV1, mw.logger)
 	controllerV1 := controllerV1Package.NewAccountController(repoV1, coreV1, mw.db, mw.logger)

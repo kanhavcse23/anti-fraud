@@ -6,8 +6,8 @@ import (
 	repoV1Package "anti-fraud/transaction-service/repository/v1"
 	routerV1Package "anti-fraud/transaction-service/routes/v1"
 
-	operationClientPackageV1 "anti-fraud/mediator-service/operation-service-client"
-	middlewareHandlerPackageV1 "anti-fraud/utils-server/middleware/v1"
+	operationClientV1Package "anti-fraud/mediator-service/operation-service-client"
+	middlewareHandlerV1Package "anti-fraud/utils-server/middleware/v1"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -18,17 +18,17 @@ type TransactionMiddleware struct {
 	db              *gorm.DB
 	router          *mux.Router
 	logger          *logrus.Logger
-	operationClient *operationClientPackageV1.OperationClient
+	operationClient *operationClientV1Package.OperationClient
 }
 
-func NewTransactionMiddleware(db *gorm.DB, router *mux.Router, logger *logrus.Logger, operationClient *operationClientPackageV1.OperationClient) *TransactionMiddleware {
+func NewTransactionMiddleware(db *gorm.DB, router *mux.Router, logger *logrus.Logger, operationClient *operationClientV1Package.OperationClient) *TransactionMiddleware {
 
 	return &TransactionMiddleware{db: db, router: router, logger: logger, operationClient: operationClient}
 }
 
 func (mw *TransactionMiddleware) Init() {
 
-	middlewareHandler := middlewareHandlerPackageV1.NewMiddlewareHandler(mw.logger)
+	middlewareHandler := middlewareHandlerV1Package.NewMiddlewareHandler(mw.logger)
 	repoV1 := repoV1Package.NewTransactionRepository(mw.logger)
 	coreV1 := coreV1Package.NewTransactionCore(repoV1, mw.logger, mw.operationClient)
 	controllerV1 := controllerV1Package.NewTransactionController(repoV1, coreV1, mw.db, mw.logger)
