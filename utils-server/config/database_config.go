@@ -19,7 +19,7 @@ type DatabaseConfig struct {
 }
 
 type Config struct {
-	Database map[string]DatabaseConfig `yaml:"database"` // Use a map for dynamic service names
+	Database DatabaseConfig `yaml:"database"` // Use a map for dynamic service names
 }
 
 var (

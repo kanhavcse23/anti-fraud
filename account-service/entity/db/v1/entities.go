@@ -1,4 +1,4 @@
-package entity_db_v1
+package account_entity_db_v1
 
 import "gorm.io/gorm"
 

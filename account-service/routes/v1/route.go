@@ -20,9 +20,8 @@ func NewAccountRoutes(controller *controllerV1Path.AccountController, router *mu
 }
 
 func (routes *AccountRoutes) Init() {
+	handlerFunc := routes.middlewareHandler.MiddlewareHandlerFunc
 
-	routes.muxRouter.HandleFunc("/accounts", routes.middlewareHandler.MiddlewareHandlerFunc(routes.controller.CreateAccount)).
-		Methods("POST")
-	routes.muxRouter.HandleFunc("/accounts/{accountId}", routes.middlewareHandler.MiddlewareHandlerFunc(routes.controller.GetAccountDetails)).
-		Methods("GET")
+	routes.muxRouter.HandleFunc("/accounts", handlerFunc(routes.controller.CreateAccount)).Methods("POST")
+	routes.muxRouter.HandleFunc("/accounts/{accountId}", handlerFunc(routes.controller.GetAccountDetails)).Methods("GET")
 }

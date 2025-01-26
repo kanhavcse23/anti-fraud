@@ -21,7 +21,7 @@ func main() {
 
 	router := mux.NewRouter()
 
-	db, err := dbConnPath.EstablishPostgresqlDBConnection("account")
+	db, err := dbConnPath.EstablishPostgresqlDBConnection()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,11 +29,7 @@ func main() {
 	accountMiddlewareV1 := account_middleware_v1.NewAccountMiddleware(db, router, logger)
 	accountMiddlewareV1.Init()
 
-	db2, err := dbConnPath.EstablishMongoDBConnection("transaction")
-	if err != nil {
-		log.Fatal(err)
-	}
-	transactionMiddlewareV1 := transaction_middleware_v1.NewTransactionMiddleware(db2)
+	transactionMiddlewareV1 := transaction_middleware_v1.NewTransactionMiddleware(db, router, logger)
 	transactionMiddlewareV1.Init()
 
 	logger.Errorf("All components has been wired.")

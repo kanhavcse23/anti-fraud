@@ -23,17 +23,11 @@ func (core *AccountCore) CreateAccount(accountPayload *entityCoreV1Path.CreateAc
 	core.logger.Info("CreateAccount method called in account core layer.")
 	account := mapperV1Path.AccountMapper(accountPayload)
 	err := core.repoV1.CreateAccount(account, tx)
-	if err != nil {
-		return nil, err
-	}
-	return account, nil
+	return account, err
 }
 
 func (core *AccountCore) GetAccount(accountId string, tx *gorm.DB) (*entityDbV1Path.Account, error) {
 	core.logger.Info("GetAccount method called in account core layer.")
 	account, err := core.repoV1.GetAccount(accountId, tx)
-	if err != nil {
-		return nil, err
-	}
-	return account, nil
+	return account, err
 }
