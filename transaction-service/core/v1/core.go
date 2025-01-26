@@ -5,7 +5,6 @@ import (
 	entityDbV1Package "anti-fraud/transaction-service/entity/db/v1"
 	mapperV1Package "anti-fraud/transaction-service/mapper/v1"
 	repoV1Package "anti-fraud/transaction-service/repository/v1"
-	"fmt"
 
 	operationClientPackageV1 "anti-fraud/mediator-service/operation-service-client"
 
@@ -27,7 +26,6 @@ func NewTransactionCore(repoV1 *repoV1Package.TransactionRepository, logger *log
 
 func (core *TransactionCore) FinalTransactionAmount(amount float64, operationTypeID int, tx *gorm.DB) (float64, error) {
 	//Business logic to compute amount by operation type id
-	fmt.Println("val.value:", core.operationClient)
 	coef, err := core.operationClient.GetOperationCoefficient(operationTypeID, tx)
 	if err != nil {
 		return amount, err

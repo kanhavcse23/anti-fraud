@@ -22,5 +22,6 @@ func (core *OperationCore) GetOperationCoefficient(operationId int, tx *gorm.DB)
 	if err != nil {
 		return 0, err
 	}
+
 	return operation.Coefficient, nil
 }
