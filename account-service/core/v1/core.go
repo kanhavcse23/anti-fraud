@@ -20,7 +20,7 @@ func NewAccountCore(repoV1 *repoV1Path.AccountRepository, logger *logrus.Logger)
 }
 
 func (core *AccountCore) CreateAccount(accountPayload *entityCoreV1Path.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Path.Account, error) {
-
+	core.logger.Info("CreateAccount method called in account core layer.")
 	account := mapperV1Path.AccountMapper(accountPayload)
 	err := core.repoV1.CreateAccount(account, tx)
 	if err != nil {
@@ -30,7 +30,7 @@ func (core *AccountCore) CreateAccount(accountPayload *entityCoreV1Path.CreateAc
 }
 
 func (core *AccountCore) GetAccount(accountId string, tx *gorm.DB) (*entityDbV1Path.Account, error) {
-
+	core.logger.Info("GetAccount method called in account core layer.")
 	account, err := core.repoV1.GetAccount(accountId, tx)
 	if err != nil {
 		return nil, err

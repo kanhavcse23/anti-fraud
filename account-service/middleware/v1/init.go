@@ -16,22 +16,20 @@ import (
 type AccountMiddleware struct {
 	db     *gorm.DB
 	router *mux.Router
+	logger *logrus.Logger
 }
 
-func NewAccountMiddleware(db *gorm.DB, router *mux.Router) *AccountMiddleware {
+func NewAccountMiddleware(db *gorm.DB, router *mux.Router, logger *logrus.Logger) *AccountMiddleware {
 
-	return &AccountMiddleware{db: db, router: router}
+	return &AccountMiddleware{db: db, router: router, logger: logger}
 }
 
 func (mw *AccountMiddleware) Init() {
-	logger := logrus.New()
-	logger.SetFormatter(&logrus.JSONFormatter{}) // Use JSON format for logs
-	logger.SetLevel(logrus.InfoLevel)
 
-	middlewareHandler := middlewareHandlerPathV1.NewMiddlewareHandler(logger)
-	repoV1 := repoV1Path.NewAccountRepository(logger)
-	coreV1 := coreV1Path.NewAccountCore(repoV1, logger)
-	controllerV1 := controllerV1Path.NewAccountController(repoV1, coreV1, mw.db, logger)
+	middlewareHandler := middlewareHandlerPathV1.NewMiddlewareHandler(mw.logger)
+	repoV1 := repoV1Path.NewAccountRepository(mw.logger)
+	coreV1 := coreV1Path.NewAccountCore(repoV1, mw.logger)
+	controllerV1 := controllerV1Path.NewAccountController(repoV1, coreV1, mw.db, mw.logger)
 	router := routerV1Path.NewAccountRoutes(controllerV1, mw.router, middlewareHandler)
 	router.Init()
 }

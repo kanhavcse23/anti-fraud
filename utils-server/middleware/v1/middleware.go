@@ -1,8 +1,6 @@
 package util_middleware_v1
 
 import (
-	"log"
-
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -20,7 +18,7 @@ func (middlewareHandler *MiddlewareHandler) MiddlewareHandlerFunc(handler http.H
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if rec := recover(); rec != nil {
-				log.Printf("Recovered from panic: %v", rec)
+				middlewareHandler.logger.Errorf("Recovered from panic: %v", rec)
 				http.Error(w, "An internal server error occurred", http.StatusInternalServerError)
 			}
 
