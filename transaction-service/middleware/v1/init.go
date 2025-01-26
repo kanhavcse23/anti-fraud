@@ -23,7 +23,7 @@ type TransactionMiddleware struct {
 
 func NewTransactionMiddleware(db *gorm.DB, router *mux.Router, logger *logrus.Logger, operationClient *operationClientPathV1.OperationClient) *TransactionMiddleware {
 
-	return &TransactionMiddleware{db: db, router: router, logger: logger}
+	return &TransactionMiddleware{db: db, router: router, logger: logger, operationClient: operationClient}
 }
 
 func (mw *TransactionMiddleware) Init() {

@@ -1,6 +1,7 @@
 package operation_repo_v1
 
 import (
+	constantPath "anti-fraud/constants/operation"
 	entityDbV1Path "anti-fraud/operation-service/entity/db/v1"
 
 	"github.com/sirupsen/logrus"
@@ -18,7 +19,7 @@ func NewOperationRepository(logger *logrus.Logger) *OperationRepository {
 func (repo *OperationRepository) GetOperation(operationId int, tx *gorm.DB) (*entityDbV1Path.Operation, error) {
 	repo.logger.Info("GetOperation method called in operation repo layer.")
 	var operation entityDbV1Path.Operation
-	result := tx.First(&operation, operationId)
+	result := tx.Table(constantPath.TABLE_NAME).First(&operation, operationId)
 	if result.Error != nil && result.Error == gorm.ErrRecordNotFound {
 		return &operation, nil
 	}
