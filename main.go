@@ -44,7 +44,7 @@ func main() {
 	operationMiddlewareV1.Init()
 	operationMiddlewareV1.ConfigureClient(operationClient)
 
-	logger.Errorf("All components has been wired.")
+	logger.Info("All components has been wired.")
 
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		fmt.Printf("Failed to start server: %v\n", err)
