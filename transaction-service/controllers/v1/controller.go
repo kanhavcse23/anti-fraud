@@ -14,14 +14,17 @@ import (
 	"gorm.io/gorm"
 )
 
+type ITransactionController interface {
+	CreateTransaction(w http.ResponseWriter, r *http.Request)
+}
 type TransactionController struct {
 	repoV1 *repoV1Package.TransactionRepository
-	coreV1 *coreV1Package.TransactionCore
+	coreV1 coreV1Package.ITransactionCore
 	db     *gorm.DB
 	logger *logrus.Logger
 }
 
-func NewTransactionController(repoV1 *repoV1Package.TransactionRepository, coreV1 *coreV1Package.TransactionCore, db *gorm.DB, logger *logrus.Logger) *TransactionController {
+func NewTransactionController(repoV1 *repoV1Package.TransactionRepository, coreV1 coreV1Package.ITransactionCore, db *gorm.DB, logger *logrus.Logger) *TransactionController {
 	return &TransactionController{repoV1: repoV1, coreV1: coreV1, db: db, logger: logger}
 }
 

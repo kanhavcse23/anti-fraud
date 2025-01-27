@@ -9,12 +9,12 @@ import (
 )
 
 type TransactionRoutes struct {
-	controller        *controllerV1Package.TransactionController
+	controller        controllerV1Package.ITransactionController
 	muxRouter         *mux.Router
 	middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler
 }
 
-func NewTransactionRoutes(controller *controllerV1Package.TransactionController, router *mux.Router, middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler) *TransactionRoutes {
+func NewTransactionRoutes(controller controllerV1Package.ITransactionController, router *mux.Router, middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler) *TransactionRoutes {
 	return &TransactionRoutes{controller: controller, muxRouter: router, middlewareHandler: middlewareHandler}
 
 }

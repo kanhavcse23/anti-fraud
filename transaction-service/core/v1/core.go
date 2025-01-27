@@ -16,14 +16,19 @@ import (
 	"gorm.io/gorm"
 )
 
+type ITransactionCore interface {
+	CreateTransaction(transactionPayload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error)
+	FinalTransactionAmount(amount float64, operationTypeID int, tx *gorm.DB) (float64, error)
+	CheckAccountIdExist(accountId int, tx *gorm.DB) error
+}
 type TransactionCore struct {
-	repoV1          *repoV1Package.TransactionRepository
+	repoV1          repoV1Package.ITransactionRepository
 	logger          *logrus.Logger
-	operationClient *operationClientPackageV1.OperationClient
-	accountClient   *accountClientPackageV1.AccountClient
+	operationClient operationClientPackageV1.IOperationClient
+	accountClient   accountClientPackageV1.IAccountClient
 }
 
-func NewTransactionCore(repoV1 *repoV1Package.TransactionRepository, logger *logrus.Logger, operationClient *operationClientPackageV1.OperationClient, accountClient *accountClientPackageV1.AccountClient) *TransactionCore {
+func NewTransactionCore(repoV1 repoV1Package.ITransactionRepository, logger *logrus.Logger, operationClient operationClientPackageV1.IOperationClient, accountClient accountClientPackageV1.IAccountClient) *TransactionCore {
 	return &TransactionCore{repoV1: repoV1, logger: logger, operationClient: operationClient, accountClient: accountClient}
 }
 

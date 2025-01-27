@@ -11,7 +11,7 @@ import (
 
 type OperationManager struct {
 	logger *logrus.Logger
-	coreV1 *coreV1Package.OperationCore
+	coreV1 coreV1Package.IOperationCore
 }
 
 func NewOperationManager(logger *logrus.Logger) *OperationManager {
@@ -24,6 +24,6 @@ func (mw *OperationManager) Init() {
 	mw.coreV1 = coreV1Package.NewOperationCore(repoV1, mw.logger)
 }
 
-func (mw *OperationManager) ConfigureClient(client *clientV1Package.OperationClient) {
+func (mw *OperationManager) ConfigureClient(client clientV1Package.IOperationClient) {
 	client.SetupCore(mw.coreV1)
 }

@@ -11,12 +11,17 @@ import (
 	"gorm.io/gorm"
 )
 
+type IAccountCore interface {
+	CreateAccount(accountPayload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error)
+	GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error)
+}
+
 type AccountCore struct {
-	repoV1 *repoV1Package.AccountRepository
+	repoV1 repoV1Package.IAccountRepository
 	logger *logrus.Logger
 }
 
-func NewAccountCore(repoV1 *repoV1Package.AccountRepository, logger *logrus.Logger) *AccountCore {
+func NewAccountCore(repoV1 repoV1Package.IAccountRepository, logger *logrus.Logger) *AccountCore {
 	return &AccountCore{repoV1: repoV1, logger: logger}
 }
 

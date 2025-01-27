@@ -9,6 +9,12 @@ import (
 	"gorm.io/gorm"
 )
 
+type IAccountRepository interface {
+	CreateAccount(account *entityDbV1Package.Account, tx *gorm.DB) error
+
+	GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error)
+	CheckDuplicateAccount(documentNumber string, tx *gorm.DB) (*entityDbV1Package.Account, error)
+}
 type AccountRepository struct {
 	logger *logrus.Logger
 }

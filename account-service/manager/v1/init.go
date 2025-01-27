@@ -18,7 +18,7 @@ type AccountManager struct {
 	db     *gorm.DB
 	router *mux.Router
 	logger *logrus.Logger
-	coreV1 *coreV1Package.AccountCore
+	coreV1 coreV1Package.IAccountCore
 }
 
 func NewAccountManager(db *gorm.DB, router *mux.Router, logger *logrus.Logger) *AccountManager {
@@ -35,6 +35,6 @@ func (mw *AccountManager) Init() {
 	router.Init()
 }
 
-func (mw *AccountManager) ConfigureClient(client *clientV1Package.AccountClient) {
+func (mw *AccountManager) ConfigureClient(client clientV1Package.IAccountClient) {
 	client.SetupCore(mw.coreV1)
 }

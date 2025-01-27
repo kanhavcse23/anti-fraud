@@ -16,14 +16,18 @@ import (
 	"gorm.io/gorm"
 )
 
+type IAccountController interface {
+	CreateAccount(w http.ResponseWriter, r *http.Request)
+	GetAccountDetails(w http.ResponseWriter, r *http.Request)
+}
 type AccountController struct {
-	repoV1 *repoV1Package.AccountRepository
-	coreV1 *coreV1Package.AccountCore
+	repoV1 repoV1Package.IAccountRepository
+	coreV1 coreV1Package.IAccountCore
 	db     *gorm.DB
 	logger *logrus.Logger
 }
 
-func NewAccountController(repoV1 *repoV1Package.AccountRepository, coreV1 *coreV1Package.AccountCore, db *gorm.DB, logger *logrus.Logger) *AccountController {
+func NewAccountController(repoV1 repoV1Package.IAccountRepository, coreV1 coreV1Package.IAccountCore, db *gorm.DB, logger *logrus.Logger) *AccountController {
 	return &AccountController{repoV1: repoV1, coreV1: coreV1, db: db, logger: logger}
 }
 

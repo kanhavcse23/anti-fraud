@@ -8,6 +8,10 @@ import (
 	"gorm.io/gorm"
 )
 
+type ITransactionRepository interface {
+	CreateTransaction(transaction *entityDbV1Package.Transaction, tx *gorm.DB) error
+}
+
 type TransactionRepository struct {
 	logger *logrus.Logger
 }

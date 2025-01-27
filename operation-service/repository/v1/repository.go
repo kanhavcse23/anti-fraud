@@ -9,6 +9,9 @@ import (
 	"gorm.io/gorm"
 )
 
+type IOperationRepository interface {
+	GetOperation(operationId int, tx *gorm.DB) (*entityDbV1Package.Operation, error)
+}
 type OperationRepository struct {
 	logger *logrus.Logger
 }

@@ -7,12 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
+type IOperationCore interface {
+	GetOperationCoefficient(operationId int, tx *gorm.DB) (int, error)
+}
 type OperationCore struct {
-	repoV1 *repoV1Package.OperationRepository
+	repoV1 repoV1Package.IOperationRepository
 	logger *logrus.Logger
 }
 
-func NewOperationCore(repoV1 *repoV1Package.OperationRepository, logger *logrus.Logger) *OperationCore {
+func NewOperationCore(repoV1 repoV1Package.IOperationRepository, logger *logrus.Logger) *OperationCore {
 	return &OperationCore{repoV1: repoV1, logger: logger}
 }
 

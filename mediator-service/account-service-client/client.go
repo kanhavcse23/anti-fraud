@@ -6,15 +6,19 @@ import (
 	"gorm.io/gorm"
 )
 
+type IAccountClient interface {
+	SetupCore(accountCoreV1 coreV1Package.IAccountCore)
+	GetAccount(accountId int, tx *gorm.DB) (*Account, error)
+}
 type AccountClient struct {
-	accountCoreV1 *coreV1Package.AccountCore
+	accountCoreV1 coreV1Package.IAccountCore
 }
 
 func NewAccountClient() *AccountClient {
 
 	return &AccountClient{}
 }
-func (client *AccountClient) SetupCore(accountCoreV1 *coreV1Package.AccountCore) {
+func (client *AccountClient) SetupCore(accountCoreV1 coreV1Package.IAccountCore) {
 	client.accountCoreV1 = accountCoreV1
 }
 func (client *AccountClient) GetAccount(accountId int, tx *gorm.DB) (*Account, error) {

@@ -9,12 +9,12 @@ import (
 )
 
 type AccountRoutes struct {
-	controller        *controllerV1Package.AccountController
+	controller        controllerV1Package.IAccountController
 	muxRouter         *mux.Router
 	middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler
 }
 
-func NewAccountRoutes(controller *controllerV1Package.AccountController, router *mux.Router, middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler) *AccountRoutes {
+func NewAccountRoutes(controller controllerV1Package.IAccountController, router *mux.Router, middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler) *AccountRoutes {
 	return &AccountRoutes{controller: controller, muxRouter: router, middlewareHandler: middlewareHandler}
 
 }

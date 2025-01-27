@@ -6,15 +6,19 @@ import (
 	"gorm.io/gorm"
 )
 
+type IOperationClient interface {
+	SetupCore(operationCoreV1 coreV1Package.IOperationCore)
+	GetOperationCoefficient(operationId int, tx *gorm.DB) (int, error)
+}
 type OperationClient struct {
-	operationCoreV1 *coreV1Package.OperationCore
+	operationCoreV1 coreV1Package.IOperationCore
 }
 
 func NewOperationClient() *OperationClient {
 
 	return &OperationClient{}
 }
-func (client *OperationClient) SetupCore(operationCoreV1 *coreV1Package.OperationCore) {
+func (client *OperationClient) SetupCore(operationCoreV1 coreV1Package.IOperationCore) {
 	client.operationCoreV1 = operationCoreV1
 }
 func (client *OperationClient) GetOperationCoefficient(operationId int, tx *gorm.DB) (int, error) {

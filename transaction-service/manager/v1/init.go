@@ -19,11 +19,11 @@ type TransactionManager struct {
 	db              *gorm.DB
 	router          *mux.Router
 	logger          *logrus.Logger
-	operationClient *operationClientV1Package.OperationClient
-	accountClient   *accountClientV1Package.AccountClient
+	operationClient operationClientV1Package.IOperationClient
+	accountClient   accountClientV1Package.IAccountClient
 }
 
-func NewTransactionManager(db *gorm.DB, router *mux.Router, logger *logrus.Logger, operationClient *operationClientV1Package.OperationClient, accountClient *accountClientV1Package.AccountClient) *TransactionManager {
+func NewTransactionManager(db *gorm.DB, router *mux.Router, logger *logrus.Logger, operationClient operationClientV1Package.IOperationClient, accountClient accountClientV1Package.IAccountClient) *TransactionManager {
 
 	return &TransactionManager{db: db, router: router, logger: logger, operationClient: operationClient, accountClient: accountClient}
 }
