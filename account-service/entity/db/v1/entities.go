@@ -1,6 +1,10 @@
 package account_entity_db_v1
 
-import "gorm.io/gorm"
+import (
+	constantPackage "anti-fraud/constants/account"
+
+	"gorm.io/gorm"
+)
 
 type Account struct {
 	gorm.Model
@@ -8,5 +12,5 @@ type Account struct {
 }
 
 func (Account) TableName() string {
-	return "account"
+	return constantPackage.TABLE_NAME
 }
