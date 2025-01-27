@@ -32,4 +32,4 @@ EXPOSE 8080
 
 
 # Run
-CMD migrate -path database/migration/ -database "postgres://postgres:postgres@postgres:5432/anti_frauddb?sslmode=disable" -verbose up && /docker-gs-ping
+CMD ["sh", "-c", "migrate -path database/migration/ -database 'postgres://postgres:postgres@postgres:5432/anti_frauddb?sslmode=disable' -verbose up && /docker-gs-ping"]

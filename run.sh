@@ -11,7 +11,11 @@ sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo apt install -y golang-go
 go mod tidy
+docker-compose down
+
+docker system prune -a -f
+
 sudo systemctl start docker
-sudo apt  install docker-compose
+sudo apt install -y docker-compose
 docker-compose up --build
 deactivate
