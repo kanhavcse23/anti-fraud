@@ -1,4 +1,4 @@
-package operation_middleware_v1
+package operation_manager_v1
 
 import (
 	coreV1Package "anti-fraud/operation-service/core/v1"
@@ -9,21 +9,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type OperationMiddleware struct {
+type OperationManager struct {
 	logger *logrus.Logger
 	coreV1 *coreV1Package.OperationCore
 }
 
-func NewOperationMiddleware(logger *logrus.Logger) *OperationMiddleware {
+func NewOperationManager(logger *logrus.Logger) *OperationManager {
 
-	return &OperationMiddleware{logger: logger}
+	return &OperationManager{logger: logger}
 }
 
-func (mw *OperationMiddleware) Init() {
+func (mw *OperationManager) Init() {
 	repoV1 := repoV1Package.NewOperationRepository(mw.logger)
 	mw.coreV1 = coreV1Package.NewOperationCore(repoV1, mw.logger)
 }
 
-func (mw *OperationMiddleware) ConfigureClient(client *clientV1Package.OperationClient) {
+func (mw *OperationManager) ConfigureClient(client *clientV1Package.OperationClient) {
 	client.SetupCore(mw.coreV1)
 }

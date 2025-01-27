@@ -1,4 +1,4 @@
-package transaction_middleware_v1
+package transaction_manager_v1
 
 import (
 	controllerV1Package "anti-fraud/transaction-service/controllers/v1"
@@ -15,7 +15,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type TransactionMiddleware struct {
+type TransactionManager struct {
 	db              *gorm.DB
 	router          *mux.Router
 	logger          *logrus.Logger
@@ -23,12 +23,12 @@ type TransactionMiddleware struct {
 	accountClient   *accountClientV1Package.AccountClient
 }
 
-func NewTransactionMiddleware(db *gorm.DB, router *mux.Router, logger *logrus.Logger, operationClient *operationClientV1Package.OperationClient, accountClient *accountClientV1Package.AccountClient) *TransactionMiddleware {
+func NewTransactionManager(db *gorm.DB, router *mux.Router, logger *logrus.Logger, operationClient *operationClientV1Package.OperationClient, accountClient *accountClientV1Package.AccountClient) *TransactionManager {
 
-	return &TransactionMiddleware{db: db, router: router, logger: logger, operationClient: operationClient, accountClient: accountClient}
+	return &TransactionManager{db: db, router: router, logger: logger, operationClient: operationClient, accountClient: accountClient}
 }
 
-func (mw *TransactionMiddleware) Init() {
+func (mw *TransactionManager) Init() {
 
 	middlewareHandler := middlewareHandlerPackageV1.NewMiddlewareHandler(mw.logger)
 	repoV1 := repoV1Package.NewTransactionRepository(mw.logger)
