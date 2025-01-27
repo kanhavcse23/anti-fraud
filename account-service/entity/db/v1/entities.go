@@ -6,3 +6,7 @@ type Account struct {
 	gorm.Model
 	DocumentNumber string `json:"document_number"`
 }
+
+func (Account) TableName() string {
+	return "account"
+}

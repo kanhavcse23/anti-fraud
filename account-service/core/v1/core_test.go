@@ -1,166 +1,191 @@
 package account_core_v1
 
-// import (
-// 	entityCoreV1Package "anti-fraud/account-service/entity/core/v1"
-// 	entityDbV1Package "anti-fraud/account-service/entity/db/v1"
-// 	repoV1Package "anti-fraud/account-service/repository/v1"
-// 	"testing"
+import (
+	"errors"
+	"testing"
 
-// 	"github.com/sirupsen/logrus"
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/mock"
-// 	"gorm.io/gorm"
-// )
+	entityCoreV1Package "anti-fraud/account-service/entity/core/v1"
+	entityDbV1Package "anti-fraud/account-service/entity/db/v1"
 
-// // Define the interface that matches AccountRepository
-// type AccountRepositoryInterface interface {
-// 	CheckDuplicateAccount(documentNumber string, tx *gorm.DB) (*entityDbV1Package.Account, error)
-// 	CreateAccount(account *entityDbV1Package.Account, tx *gorm.DB) error
-// 	GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error)
-// }
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"gorm.io/gorm"
+)
 
-// // MockAccountRepository is a mock for AccountRepository
-// type MockAccountRepository struct {
-// 	mock.Mock
-// 	repoV1Package.AccountRepository // Embed the original repository to satisfy the interface
-// }
+//-----------------//
+// Mock Repository //
+//-----------------//
 
-// func (m *MockAccountRepository) CheckDuplicateAccount(documentNumber string, tx *gorm.DB) (*entityDbV1Package.Account, error) {
-// 	args := m.Called(documentNumber, tx)
-// 	return args.Get(0).(*entityDbV1Package.Account), args.Error(1)
-// }
+type MockAccountRepository struct {
+	mock.Mock
+}
 
-// func (m *MockAccountRepository) CreateAccount(account *entityDbV1Package.Account, tx *gorm.DB) error {
-// 	args := m.Called(account, tx)
-// 	return args.Error(0)
-// }
+// CheckDuplicateAccount mock
+func (m *MockAccountRepository) CheckDuplicateAccount(documentNumber string, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+	args := m.Called(documentNumber, tx)
+	account, _ := args.Get(0).(*entityDbV1Package.Account)
+	return account, args.Error(1)
+}
 
-// func (m *MockAccountRepository) GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
-// 	args := m.Called(accountId, tx)
-// 	return args.Get(0).(*entityDbV1Package.Account), args.Error(1)
-// }
+// CreateAccount mock
+func (m *MockAccountRepository) CreateAccount(account *entityDbV1Package.Account, tx *gorm.DB) error {
+	args := m.Called(account, tx)
+	return args.Error(0)
+}
 
-// func TestCreateAccount(t *testing.T) {
-// 	// Setup
-// 	mockRepo := &MockAccountRepository{}
-// 	logger := logrus.New()
-// 	core := NewAccountCore(mockRepo, logger)
-// 	tx := &gorm.DB{}
+// GetAccount mock
+func (m *MockAccountRepository) GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+	args := m.Called(accountId, tx)
+	account, _ := args.Get(0).(*entityDbV1Package.Account)
+	return account, args.Error(1)
+}
 
-// 	tests := []struct {
-// 		name           string
-// 		payload        *entityCoreV1Package.CreateAccountPayload
-// 		setupMock      func()
-// 		expectedError  bool
-// 		expectedResult *entityDbV1Package.Account
-// 	}{
-// 		{
-// 			name: "Success - Create New Account",
-// 			payload: &entityCoreV1Package.CreateAccountPayload{
-// 				DocumentNumber: "12345",
-// 			},
-// 			setupMock: func() {
-// 				mockRepo.On("CheckDuplicateAccount", "12345", tx).Return(&entityDbV1Package.Account{}, nil)
-// 				mockRepo.On("CreateAccount", mock.AnythingOfType("*entityDbV1Package.Account"), tx).Return(nil)
-// 			},
-// 			expectedError: false,
-// 			expectedResult: &entityDbV1Package.Account{
-// 				DocumentNumber: "12345",
-// 			},
-// 		},
-// 		{
-// 			name: "Failure - Duplicate Account",
-// 			payload: &entityCoreV1Package.CreateAccountPayload{
-// 				DocumentNumber: "12345",
-// 			},
-// 			setupMock: func() {
-// 				mockRepo.On("CheckDuplicateAccount", "12345", tx).Return(&entityDbV1Package.Account{
-// 					DocumentNumber: "12345",
-// 				}, nil)
-// 			},
-// 			expectedError: true,
-// 			expectedResult: &entityDbV1Package.Account{
-// 				DocumentNumber: "12345",
-// 			},
-// 		},
-// 	}
+//------------------//
+// Utility Mappers  //
+//------------------//
 
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			// Setup mocks for this test case
-// 			mockRepo.ExpectedCalls = nil
-// 			tt.setupMock()
+// If you need the actual mapper logic, you can mock or directly use the real function.
+// For example, we can assume mapperV1Package.AccountMapper just does a simple transform:
+func init() {
 
-// 			// Execute
-// 			result, err := core.CreateAccount(tt.payload, tx)
+}
 
-// 			// Assert
-// 			if tt.expectedError {
-// 				assert.Error(t, err)
-// 			} else {
-// 				assert.NoError(t, err)
-// 			}
-// 			assert.Equal(t, tt.expectedResult.DocumentNumber, result.DocumentNumber)
-// 			mockRepo.AssertExpectations(t)
-// 		})
-// 	}
-// }
+//---------------------//
+//   Unit Test Setup   //
+//---------------------//
 
-// func TestGetAccount(t *testing.T) {
-// 	// Setup
-// 	mockRepo := &MockAccountRepository{}
-// 	logger := logrus.New()
-// 	core := NewAccountCore(mockRepo, logger)
-// 	tx := &gorm.DB{}
+func setupTest() (*MockAccountRepository, *AccountCore) {
+	mockRepo := new(MockAccountRepository)
+	logger := logrus.New()
 
-// 	tests := []struct {
-// 		name           string
-// 		accountID      int
-// 		setupMock      func()
-// 		expectedError  bool
-// 		expectedResult *entityDbV1Package.Account
-// 	}{
-// 		{
-// 			name:      "Success - Get Existing Account",
-// 			accountID: 1,
-// 			setupMock: func() {
-// 				mockRepo.On("GetAccount", 1, tx).Return(&entityDbV1Package.Account{
-// 					DocumentNumber: "12345",
-// 				}, nil)
-// 			},
-// 			expectedError: false,
-// 			expectedResult: &entityDbV1Package.Account{
-// 				DocumentNumber: "12345",
-// 			},
-// 		},
-// 		{
-// 			name:      "Failure - Account Not Found",
-// 			accountID: 999,
-// 			setupMock: func() {
-// 				mockRepo.On("GetAccount", 999, tx).Return(&entityDbV1Package.Account{}, gorm.ErrRecordNotFound)
-// 			},
-// 			expectedError:  true,
-// 			expectedResult: &entityDbV1Package.Account{},
-// 		},
-// 	}
+	accountCore := NewAccountCore(mockRepo, logger)
 
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			// Setup mocks for this test case
-// 			mockRepo.ExpectedCalls = nil
-// 			tt.setupMock()
+	return mockRepo, accountCore
+}
 
-// 			// Execute
-// 			result, err := core.GetAccount(tt.accountID, tx)
+//-------------------------------//
+// Tests for CreateAccount Method //
+//-------------------------------//
 
-// 			// Assert
-// 			if tt.expectedError {
-// 				assert.Error(t, err)
-// 			} else {
-// 				assert.NoError(t, err)
-// 				assert.Equal(t, tt.expectedResult.DocumentNumber, result.DocumentNumber)
-// 			}
-// 			mockRepo.AssertExpectations(t)
-// 		})
-// 	}
-// }
+func TestCreateAccount_Success(t *testing.T) {
+	mockRepo, accountCore := setupTest()
+
+	// Define input payload
+	payload := &entityCoreV1Package.CreateAccountPayload{
+		DocumentNumber: "123456789",
+	}
+
+	// Mock repository calls
+	// 1. CheckDuplicateAccount -> returns nil account, no error
+	mockRepo.On("CheckDuplicateAccount", payload.DocumentNumber, mock.Anything).Return(&entityDbV1Package.Account{}, nil)
+	// 2. CreateAccount -> returns no error
+	mockRepo.On("CreateAccount", mock.Anything, mock.Anything).Return(nil)
+
+	account, err := accountCore.CreateAccount(payload, &gorm.DB{})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, account)
+	assert.Equal(t, payload.DocumentNumber, account.DocumentNumber)
+
+	mockRepo.AssertExpectations(t)
+}
+
+func TestCreateAccount_DuplicateAccount(t *testing.T) {
+	mockRepo, accountCore := setupTest()
+
+	payload := &entityCoreV1Package.CreateAccountPayload{
+		DocumentNumber: "123456789",
+	}
+
+	// Simulate the account already existing
+	existingAccount := &entityDbV1Package.Account{
+		Model:          gorm.Model{ID: 1},
+		DocumentNumber: "123456789",
+	}
+
+	mockRepo.On("CheckDuplicateAccount", payload.DocumentNumber, mock.Anything).Return(existingAccount, nil)
+
+	account, err := accountCore.CreateAccount(payload, &gorm.DB{})
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Duplicate account found")
+	assert.NotNil(t, account)
+	assert.Equal(t, existingAccount, account) // The core returns the found account
+
+	mockRepo.AssertExpectations(t)
+}
+
+func TestCreateAccount_RepoError(t *testing.T) {
+	mockRepo, accountCore := setupTest()
+
+	payload := &entityCoreV1Package.CreateAccountPayload{
+		DocumentNumber: "123456789",
+	}
+
+	mockRepo.On("CheckDuplicateAccount", payload.DocumentNumber, mock.Anything).
+		Return(&entityDbV1Package.Account{}, errors.New("some repo error"))
+
+	account, err := accountCore.CreateAccount(payload, &gorm.DB{})
+
+	assert.Error(t, err)
+	assert.Equal(t, 0, int(account.ID)) // or assert.Equal(t, &entityDbV1Package.Account{}, account) depending on your design
+
+	mockRepo.AssertExpectations(t)
+}
+
+//----------------------------//
+// Tests for GetAccount Method //
+//----------------------------//
+
+func TestGetAccount_Success(t *testing.T) {
+	mockRepo, accountCore := setupTest()
+
+	// Mock data
+	accountID := 1
+	accountDB := &entityDbV1Package.Account{
+		Model:          gorm.Model{ID: 1},
+		DocumentNumber: "123456789",
+	}
+
+	mockRepo.On("GetAccount", accountID, mock.Anything).Return(accountDB, nil)
+
+	account, err := accountCore.GetAccount(accountID, &gorm.DB{})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, account)
+	assert.Equal(t, accountID, int(account.ID))
+	assert.Equal(t, "123456789", account.DocumentNumber)
+
+	mockRepo.AssertExpectations(t)
+}
+
+func TestGetAccount_NotFound(t *testing.T) {
+	mockRepo, accountCore := setupTest()
+
+	accountID := 1
+	mockRepo.On("GetAccount", accountID, mock.Anything).Return((*entityDbV1Package.Account)(nil), gorm.ErrRecordNotFound)
+
+	account, err := accountCore.GetAccount(accountID, &gorm.DB{})
+
+	assert.Error(t, err)
+	assert.Nil(t, account)
+	assert.Equal(t, gorm.ErrRecordNotFound, err)
+
+	mockRepo.AssertExpectations(t)
+}
+
+func TestGetAccount_RepoError(t *testing.T) {
+	mockRepo, accountCore := setupTest()
+
+	accountID := 2
+	mockRepo.On("GetAccount", accountID, mock.Anything).Return((*entityDbV1Package.Account)(nil), errors.New("db error"))
+
+	account, err := accountCore.GetAccount(accountID, &gorm.DB{})
+
+	assert.Error(t, err)
+	assert.Nil(t, account)
+	assert.Contains(t, err.Error(), "db error")
+
+	mockRepo.AssertExpectations(t)
+}
