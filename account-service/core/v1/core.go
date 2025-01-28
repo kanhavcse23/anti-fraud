@@ -15,11 +15,9 @@ import (
 type IAccountCore interface {
 
 	// CreateAccount creates a new account if the given document number is not already registered.
-	// It returns the newly created account or an error if the account exists or the DB operation fails.
 	CreateAccount(accountPayload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error)
 
 	// GetAccount retrieves an account by its unique ID.
-	// It returns found account or an encountered Error.
 	GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error)
 }
 
