@@ -1,5 +1,4 @@
-Anti-Fraud System
-    The Anti-Fraud System is designed to detect and prevent fraudulent financial transactions. It employs a microservices architecture, primarily developed in Go, to ensure scalability, maintainability, and efficient handling of various components.
+Project employs a microservices architecture, primarily developed in Go, to ensure scalability, maintainability, and efficient handling of various components.
 
 Table of Contents:
 - Project Overview
