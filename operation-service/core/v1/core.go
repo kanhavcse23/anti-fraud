@@ -43,7 +43,7 @@ func (core *OperationCore) GetOperationCoefficient(logger *logrus.Entry, operati
 	logger.Info("GetOperationCoefficient method called in operation core layer.")
 	operation, err := core.repoV1.GetOperation(logger, operationId, tx)
 	if err != nil {
-		logger.Errorf("Error occured while fetching coefficient associated with operationId (%d) : %s", operationId, err.Error())
+		logger.Errorf("Error occured while fetching coefficient associated with operation: %s", err.Error())
 		return 0, err
 	}
 	return operation.Coefficient, nil

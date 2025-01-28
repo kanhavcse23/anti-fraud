@@ -90,7 +90,7 @@ func (core *TransactionCore) CheckAccountIdExist(logger *logrus.Entry, accountId
 		return err
 	}
 	if account.Id == 0 { // account id not found in database
-		logger.Errorf("account_id: %d not found in database", accountId)
+		logger.Error("Error: account_id not found in database")
 		return fmt.Errorf("account_id: %d not found in database", accountId)
 	}
 	return nil

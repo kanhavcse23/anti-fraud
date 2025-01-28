@@ -63,7 +63,6 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 	ctx := r.Context()
 	requestID := utilV1.GetRequestID(ctx)
 	logger := controller.logger.WithField("request_id", requestID)
-	logger.Info("CreateAccount endpoint called.")
 
 	// 1. Decode JSON request body.
 	var accountReq entityHttpV1Package.CreateAccountRequest
@@ -73,6 +72,8 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 		http.Error(w, "Error decoding request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	logger.Infof("CreateAccount endpoint called input payload: %v", accountReq)
 
 	// 2. Validate HTTP input payload.
 	err = accountReq.Validate()

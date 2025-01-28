@@ -51,7 +51,7 @@ func (client *OperationClient) GetOperationCoefficient(logger *logrus.Entry, ope
 	logger.Info("GetOperationCoefficient method called in mediator-service for operation client.")
 	coef, err := client.operationCoreV1.GetOperationCoefficient(logger, operationId, tx)
 	if err != nil {
-		logger.Errorf("Error occured while fetching coefficient associated on operationId %d via operation service: %s", operationId, err.Error())
+		logger.Errorf("Error occured while fetching coefficient associated on operation via operation service: %s", err.Error())
 	}
 	return coef, err
 }

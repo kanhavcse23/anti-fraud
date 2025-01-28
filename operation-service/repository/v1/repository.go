@@ -45,7 +45,7 @@ func (repo *OperationRepository) GetOperation(logger *logrus.Entry, operationId 
 	var operation entityDbV1Package.Operation
 	result := tx.Table(constantPackage.TABLE_NAME).First(&operation, operationId)
 	if result.Error != nil && result.Error == gorm.ErrRecordNotFound {
-		logger.Errorf("operation id=%d not found in database", operationId)
+		logger.Errorf("Error: operationId not found in database.")
 		return &operation, fmt.Errorf("operation id: %d not found in database", operationId)
 	} else if result.Error != nil {
 		logger.Errorf("Error occured while running GET query on db: %s", result.Error.Error())

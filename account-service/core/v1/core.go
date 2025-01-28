@@ -60,7 +60,7 @@ func (core *AccountCore) CreateAccount(logger *logrus.Entry, accountPayload *ent
 
 	// 2. If a duplicate exists, return it along with an error
 	if accountFound.ID > 0 {
-		logger.Errorf("Duplicate account found with document_number: %s", accountPayload.DocumentNumber)
+		logger.Error("Error: Duplicate account found")
 		return accountFound, fmt.Errorf("duplicate account found with document_number: %s", accountPayload.DocumentNumber)
 	}
 

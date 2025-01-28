@@ -49,7 +49,7 @@ func (controller *TransactionController) CreateTransaction(w http.ResponseWriter
 	ctx := r.Context()
 	requestID := utilV1.GetRequestID(ctx)
 	logger := controller.logger.WithField("request_id", requestID)
-	logger.Info("CreateTransaction endpoint called")
+
 	var transactionReq entityHttpV1Package.CreateTransactionRequest
 
 	// 1. Decode HTTP input payload.
@@ -59,6 +59,8 @@ func (controller *TransactionController) CreateTransaction(w http.ResponseWriter
 		http.Error(w, "Error decoding request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	logger.Infof("CreateTransaction endpoint called input payload: %v", transactionReq)
 
 	// 2. Validate payload.
 	err = transactionReq.Validate()
