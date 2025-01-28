@@ -1,10 +1,16 @@
 package util_middleware_v1
 
 import (
+	"context"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
+
+type contextKey string
+
+const requestIDKey contextKey = "requestID"
 
 type MiddlewareHandler struct {
 	logger *logrus.Logger
@@ -24,12 +30,23 @@ func (middlewareHandler *MiddlewareHandler) MiddlewareHandlerFunc(handler http.H
 			}
 
 		}()
+		reqID := uuid.New().String()
+		ctx := context.WithValue(r.Context(), requestIDKey, reqID)
 
 		middlewareHandler.logger.WithFields(logrus.Fields{
-			"method": r.Method,
-			"path":   r.URL.Path,
+			"method":     r.Method,
+			"path":       r.URL.Path,
+			"request_id": reqID,
 		}).Info("API triggered")
 
-		handler(w, r)
+		handler(w, r.WithContext(ctx))
 	}
+}
+
+// Helper to retrieve the request ID from context in controllers or anywhere else
+func GetRequestID(ctx context.Context) string {
+	if val, ok := ctx.Value(requestIDKey).(string); ok {
+		return val
+	}
+	return ""
 }

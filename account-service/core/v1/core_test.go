@@ -17,18 +17,18 @@ type MockAccountRepository struct {
 	mock.Mock
 }
 
-func (m *MockAccountRepository) CheckDuplicateAccount(documentNumber string, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+func (m *MockAccountRepository) CheckDuplicateAccount(logger *logrus.Entry, documentNumber string, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	args := m.Called(documentNumber, tx)
 	account, _ := args.Get(0).(*entityDbV1Package.Account)
 	return account, args.Error(1)
 }
 
-func (m *MockAccountRepository) CreateAccount(account *entityDbV1Package.Account, tx *gorm.DB) error {
+func (m *MockAccountRepository) CreateAccount(logger *logrus.Entry, account *entityDbV1Package.Account, tx *gorm.DB) error {
 	args := m.Called(account, tx)
 	return args.Error(0)
 }
 
-func (m *MockAccountRepository) GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+func (m *MockAccountRepository) GetAccount(logger *logrus.Entry, accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	args := m.Called(accountId, tx)
 	account, _ := args.Get(0).(*entityDbV1Package.Account)
 	return account, args.Error(1)
@@ -59,7 +59,7 @@ func setupTest() (*MockAccountRepository, *AccountCore) {
 
 func TestCreateAccount_Success(t *testing.T) {
 	mockRepo, accountCore := setupTest()
-
+	logger := logrus.NewEntry(logrus.New())
 	payload := &entityCoreV1Package.CreateAccountPayload{
 		DocumentNumber: "123456789",
 	}
@@ -69,7 +69,7 @@ func TestCreateAccount_Success(t *testing.T) {
 	// 2. CreateAccount -> returns no error
 	mockRepo.On("CreateAccount", mock.Anything, mock.Anything).Return(nil)
 
-	account, err := accountCore.CreateAccount(payload, &gorm.DB{})
+	account, err := accountCore.CreateAccount(logger, payload, &gorm.DB{})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, account)
@@ -91,11 +91,11 @@ func TestCreateAccount_DuplicateAccount(t *testing.T) {
 	}
 
 	mockRepo.On("CheckDuplicateAccount", payload.DocumentNumber, mock.Anything).Return(existingAccount, nil)
-
-	account, err := accountCore.CreateAccount(payload, &gorm.DB{})
+	logger := logrus.NewEntry(logrus.New())
+	account, err := accountCore.CreateAccount(logger, payload, &gorm.DB{})
 
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Duplicate account found")
+	assert.Contains(t, err.Error(), "duplicate account found")
 	assert.NotNil(t, account)
 	assert.Equal(t, existingAccount, account)
 
@@ -111,8 +111,9 @@ func TestCreateAccount_RepoError(t *testing.T) {
 
 	mockRepo.On("CheckDuplicateAccount", payload.DocumentNumber, mock.Anything).
 		Return(&entityDbV1Package.Account{}, errors.New("some repo error"))
+	logger := logrus.NewEntry(logrus.New())
 
-	account, err := accountCore.CreateAccount(payload, &gorm.DB{})
+	account, err := accountCore.CreateAccount(logger, payload, &gorm.DB{})
 
 	assert.Error(t, err)
 	assert.Equal(t, 0, int(account.ID))
@@ -135,8 +136,9 @@ func TestGetAccount_Success(t *testing.T) {
 	}
 
 	mockRepo.On("GetAccount", accountID, mock.Anything).Return(accountDB, nil)
+	logger := logrus.NewEntry(logrus.New())
 
-	account, err := accountCore.GetAccount(accountID, &gorm.DB{})
+	account, err := accountCore.GetAccount(logger, accountID, &gorm.DB{})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, account)
@@ -151,8 +153,9 @@ func TestGetAccount_NotFound(t *testing.T) {
 
 	accountID := 1
 	mockRepo.On("GetAccount", accountID, mock.Anything).Return((*entityDbV1Package.Account)(nil), gorm.ErrRecordNotFound)
+	logger := logrus.NewEntry(logrus.New())
 
-	account, err := accountCore.GetAccount(accountID, &gorm.DB{})
+	account, err := accountCore.GetAccount(logger, accountID, &gorm.DB{})
 
 	assert.Error(t, err)
 	assert.Nil(t, account)
@@ -166,8 +169,9 @@ func TestGetAccount_RepoError(t *testing.T) {
 
 	accountID := 2
 	mockRepo.On("GetAccount", accountID, mock.Anything).Return((*entityDbV1Package.Account)(nil), errors.New("db error"))
+	logger := logrus.NewEntry(logrus.New())
 
-	account, err := accountCore.GetAccount(accountID, &gorm.DB{})
+	account, err := accountCore.GetAccount(logger, accountID, &gorm.DB{})
 
 	assert.Error(t, err)
 	assert.Nil(t, account)

@@ -36,7 +36,7 @@ func TestCreateTransaction_Success(t *testing.T) {
 		Amount:          100.50,
 	}
 
-	err := repo.CreateTransaction(txModel, db)
+	err := repo.CreateTransaction(logrus.NewEntry(logrus.New()), txModel, db)
 	assert.NoError(t, err, "expected no error inserting transaction")
 	assert.NotZero(t, txModel.ID, "expected transaction to have a generated ID after insert")
 
@@ -63,7 +63,7 @@ func TestCreateTransaction_DBError(t *testing.T) {
 		Amount:          500,
 	}
 
-	err = repo.CreateTransaction(txModel, db)
+	err = repo.CreateTransaction(logrus.NewEntry(logrus.New()), txModel, db)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "database is closed")
 }

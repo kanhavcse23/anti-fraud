@@ -13,13 +13,13 @@ import (
 type IAccountRepository interface {
 
 	// CreateAccount persists a new account record to the db.
-	CreateAccount(account *entityDbV1Package.Account, tx *gorm.DB) error
+	CreateAccount(logger *logrus.Entry, account *entityDbV1Package.Account, tx *gorm.DB) error
 
 	// GetAccount retrieves an account by its unique ID.
-	GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error)
+	GetAccount(logger *logrus.Entry, accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error)
 
 	// CheckDuplicateAccount checks if an account with the given document number already exists.
-	CheckDuplicateAccount(documentNumber string, tx *gorm.DB) (*entityDbV1Package.Account, error)
+	CheckDuplicateAccount(logger *logrus.Entry, documentNumber string, tx *gorm.DB) (*entityDbV1Package.Account, error)
 }
 
 // AccountRepository implements IAccountRepository methods.
@@ -44,7 +44,7 @@ func NewAccountRepository(logger *logrus.Logger) *AccountRepository {
 //
 // Returns:
 //   - An error if the insert fails, otherwise nil.
-func (repo *AccountRepository) CreateAccount(account *entityDbV1Package.Account, tx *gorm.DB) error {
+func (repo *AccountRepository) CreateAccount(logger *logrus.Entry, account *entityDbV1Package.Account, tx *gorm.DB) error {
 	repo.logger.Info("CreateAccount method called in account repo layer.")
 	result := tx.Table(constantPackage.TABLE_NAME).Create(account)
 	if result.Error != nil {
@@ -67,13 +67,15 @@ func (repo *AccountRepository) CreateAccount(account *entityDbV1Package.Account,
 // Returns:
 //   - db entity account.
 //   - Encountered Error.
-func (repo *AccountRepository) GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+func (repo *AccountRepository) GetAccount(logger *logrus.Entry, accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	repo.logger.Info("GetAccount method called in account repo layer.")
 	var account entityDbV1Package.Account
 	result := tx.Table(constantPackage.TABLE_NAME).First(&account, accountId)
 	if result.Error != nil && result.Error == gorm.ErrRecordNotFound {
-		repo.logger.Error("Failed to find account")
+		repo.logger.Errorf("Failed to find account with accountId: %d", accountId)
 		return &account, nil
+	} else if result.Error != nil {
+		repo.logger.Errorf("Error occured while running GET query on db: %s", result.Error.Error())
 	}
 	return &account, result.Error
 }
@@ -93,14 +95,16 @@ func (repo *AccountRepository) GetAccount(accountId int, tx *gorm.DB) (*entityDb
 //   - db entity account.
 //   - Encountered Error.
 
-func (repo *AccountRepository) CheckDuplicateAccount(documentNumber string, tx *gorm.DB) (*entityDbV1Package.Account, error) {
-	repo.logger.Info("CheckDuplicateAccount method called in account repo layer.")
+func (repo *AccountRepository) CheckDuplicateAccount(logger *logrus.Entry, documentNumber string, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+	logger.Info("CheckDuplicateAccount method called in account repo layer.")
 	var account entityDbV1Package.Account
 	result := tx.Table(constantPackage.TABLE_NAME).
 		Where("document_number = ?", documentNumber).First(&account)
 	if result.Error != nil && result.Error == gorm.ErrRecordNotFound { // account doesn't exist with `documentNumber`
-		repo.logger.Errorf("Failed to find account")
+		logger.Errorf("Failed to find account with document_number: %s", documentNumber)
 		return &account, nil
+	} else if result.Error != nil {
+		logger.Errorf("Error occured while running GET query on db: %s", result.Error.Error())
 	}
 	return &account, result.Error
 }

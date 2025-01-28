@@ -26,13 +26,13 @@ type MockAccountCore struct {
 	mock.Mock
 }
 
-func (m *MockAccountCore) CreateAccount(payload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+func (m *MockAccountCore) CreateAccount(logger *logrus.Entry, payload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	args := m.Called(payload, tx)
 	account, _ := args.Get(0).(*entityDbV1Package.Account)
 	return account, args.Error(1)
 }
 
-func (m *MockAccountCore) GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+func (m *MockAccountCore) GetAccount(logger *logrus.Entry, accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	args := m.Called(accountId, tx)
 	account, _ := args.Get(0).(*entityDbV1Package.Account)
 	return account, args.Error(1)

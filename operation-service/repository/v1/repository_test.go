@@ -35,7 +35,7 @@ func TestGetOperation_Success(t *testing.T) {
 	result := db.Table(constantPackage.TABLE_NAME).Create(&op)
 	assert.NoError(t, result.Error, "failed to insert operation")
 
-	found, err := repo.GetOperation(int(op.ID), db)
+	found, err := repo.GetOperation(logrus.NewEntry(logrus.New()), int(op.ID), db)
 	assert.NoError(t, err)
 	assert.NotNil(t, found)
 	assert.Equal(t, op.ID, found.ID)
@@ -47,7 +47,7 @@ func TestGetOperation_NotFound(t *testing.T) {
 	repo := NewOperationRepository(logger)
 	db := setupTestDB(t)
 
-	found, err := repo.GetOperation(999, db)
+	found, err := repo.GetOperation(logrus.NewEntry(logrus.New()), 999, db)
 
 	assert.Error(t, err)
 	assert.Equal(t, 0, int(found.ID))
@@ -64,7 +64,7 @@ func TestGetOperation_DBError(t *testing.T) {
 		sqlDB.Close()
 	}
 
-	found, err := repo.GetOperation(1, db)
+	found, err := repo.GetOperation(logrus.NewEntry(logrus.New()), 1, db)
 	assert.Error(t, err)
 	assert.Equal(t, 0, int(found.ID))
 

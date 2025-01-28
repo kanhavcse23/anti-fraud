@@ -14,7 +14,7 @@ type IOperationClient interface {
 	SetupCore(operationCoreV1 coreV1Package.IOperationCore)
 
 	// GetOperationCoefficient fetches the coefficient for a specific operation ID.
-	GetOperationCoefficient(operationId int, tx *gorm.DB) (int, error)
+	GetOperationCoefficient(logger *logrus.Entry, operationId int, tx *gorm.DB) (int, error)
 }
 
 // OperationClient implements IOperationClient, acting as a mediator to the operation core service.
@@ -47,7 +47,11 @@ func (client *OperationClient) SetupCore(operationCoreV1 coreV1Package.IOperatio
 // Returns:
 //   - int:   The coefficient associated with the operation ID.
 //   - error: an encountered Error.
-func (client *OperationClient) GetOperationCoefficient(operationId int, tx *gorm.DB) (int, error) {
-	client.logger.Info("GetOperationCoefficient method called in mediator-service for operation client.")
-	return client.operationCoreV1.GetOperationCoefficient(operationId, tx)
+func (client *OperationClient) GetOperationCoefficient(logger *logrus.Entry, operationId int, tx *gorm.DB) (int, error) {
+	logger.Info("GetOperationCoefficient method called in mediator-service for operation client.")
+	coef, err := client.operationCoreV1.GetOperationCoefficient(logger, operationId, tx)
+	if err != nil {
+		logger.Errorf("Error occured while fetching coefficient associated on operationId %d via operation service: %s", operationId, err.Error())
+	}
+	return coef, err
 }

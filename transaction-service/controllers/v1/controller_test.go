@@ -27,18 +27,18 @@ type MockTransactionCore struct {
 	mock.Mock
 }
 
-func (m *MockTransactionCore) CreateTransaction(payload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error) {
+func (m *MockTransactionCore) CreateTransaction(logger *logrus.Entry, payload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error) {
 	args := m.Called(payload, tx)
 	transaction, _ := args.Get(0).(*entityDbV1Package.Transaction)
 	return transaction, args.Error(1)
 }
 
-func (m *MockTransactionCore) FinalTransactionAmount(amount float64, operationTypeID int, tx *gorm.DB) (float64, error) {
+func (m *MockTransactionCore) FinalTransactionAmount(logger *logrus.Entry, amount float64, operationTypeID int, tx *gorm.DB) (float64, error) {
 	args := m.Called(amount, operationTypeID, tx)
 	return args.Get(0).(float64), args.Error(1)
 }
 
-func (m *MockTransactionCore) CheckAccountIdExist(accountId int, tx *gorm.DB) error {
+func (m *MockTransactionCore) CheckAccountIdExist(logger *logrus.Entry, accountId int, tx *gorm.DB) error {
 	args := m.Called(accountId, tx)
 	return args.Error(0)
 }

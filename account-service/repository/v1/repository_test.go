@@ -37,7 +37,7 @@ func TestCreateAccount_Success(t *testing.T) {
 		DocumentNumber: "123456789",
 	}
 
-	err := repo.CreateAccount(acc, db)
+	err := repo.CreateAccount(logrus.NewEntry(logrus.New()), acc, db)
 	assert.NoError(t, err, "expected no error on account creation")
 	assert.NotZero(t, acc.ID, "expected the newly created account to have a non-zero ID")
 
@@ -57,7 +57,7 @@ func TestGetAccount_Success(t *testing.T) {
 	}
 	db.Create(acc)
 
-	got, err := repo.GetAccount(int(acc.ID), db)
+	got, err := repo.GetAccount(logrus.NewEntry(logrus.New()), int(acc.ID), db)
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 	assert.Equal(t, acc.ID, got.ID)
@@ -69,7 +69,7 @@ func TestGetAccount_NotFound(t *testing.T) {
 	logger := logrus.New()
 	repo := NewAccountRepository(logger)
 
-	got, err := repo.GetAccount(9999, db)
+	got, err := repo.GetAccount(logrus.NewEntry(logrus.New()), 9999, db)
 
 	assert.NoError(t, err, "repository returns nil error for not found")
 	assert.NotNil(t, got)
@@ -81,7 +81,7 @@ func TestCheckDuplicateAccount_NoDuplicate(t *testing.T) {
 	logger := logrus.New()
 	repo := NewAccountRepository(logger)
 
-	got, err := repo.CheckDuplicateAccount("unique", db)
+	got, err := repo.CheckDuplicateAccount(logrus.NewEntry(logrus.New()), "unique", db)
 	assert.NoError(t, err, "no error should occur if record not found")
 	assert.Equal(t, uint(0), got.ID, "ID should be zero if not found")
 }
@@ -96,7 +96,7 @@ func TestCheckDuplicateAccount_Found(t *testing.T) {
 	}
 	db.Create(acc)
 
-	got, err := repo.CheckDuplicateAccount("duplicate", db)
+	got, err := repo.CheckDuplicateAccount(logrus.NewEntry(logrus.New()), "duplicate", db)
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 	assert.Equal(t, acc.ID, got.ID)

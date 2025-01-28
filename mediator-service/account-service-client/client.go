@@ -14,7 +14,7 @@ type IAccountClient interface {
 	SetupCore(accountCoreV1 coreV1Package.IAccountCore)
 
 	// GetAccount retrieves an account by its ID, returning a local Account struct.
-	GetAccount(accountId int, tx *gorm.DB) (*Account, error)
+	GetAccount(logger *logrus.Entry, accountId int, tx *gorm.DB) (*Account, error)
 }
 
 // AccountClient implements IAccountClient(interface)
@@ -48,11 +48,12 @@ func (client *AccountClient) SetupCore(accountCoreV1 coreV1Package.IAccountCore)
 // Returns:
 //   - *Account: The mediator-level account struct (e.g. DocumentNumber).
 //   - error:    an encountered Error.
-func (client *AccountClient) GetAccount(accountId int, tx *gorm.DB) (*Account, error) {
-	client.logger.Info("GetAccount method called in mediator-service for account client.")
+func (client *AccountClient) GetAccount(logger *logrus.Entry, accountId int, tx *gorm.DB) (*Account, error) {
+	logger.Info("GetAccount method called in mediator-service for account client.")
 
-	account, err := client.accountCoreV1.GetAccount(accountId, tx)
+	account, err := client.accountCoreV1.GetAccount(logger, accountId, tx)
 	if err != nil {
+		logger.Errorf("Error occured while fetching account data via account service: %s", err.Error())
 		return &Account{}, err
 	}
 	return &Account{Id: int(account.ID), DocumentNumber: account.DocumentNumber}, nil

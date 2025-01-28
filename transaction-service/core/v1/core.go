@@ -20,14 +20,14 @@ import (
 type ITransactionCore interface {
 
 	// CreateTransaction creates a new transaction record in the db
-	CreateTransaction(transactionPayload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error)
+	CreateTransaction(logger *logrus.Entry, transactionPayload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error)
 
 	// FinalTransactionAmount applies business logic to compute the final transaction amount
 	// based on the operationTypeID and coefficient retrieved from the operation service.
-	FinalTransactionAmount(amount float64, operationTypeID int, tx *gorm.DB) (float64, error)
+	FinalTransactionAmount(logger *logrus.Entry, amount float64, operationTypeID int, tx *gorm.DB) (float64, error)
 
 	// CheckAccountIdExist verifies whether the provided accountId exists by calling the account service.
-	CheckAccountIdExist(accountId int, tx *gorm.DB) error
+	CheckAccountIdExist(logger *logrus.Entry, accountId int, tx *gorm.DB) error
 }
 
 // TransactionCore implements ITransactionCore interface.
@@ -58,11 +58,11 @@ func NewTransactionCore(repoV1 repoV1Package.ITransactionRepository, logger *log
 // Returns:
 //   - float64: The final computed transaction amount after applying the operation coefficient.
 //   - error:   Encountered Error.
-func (core *TransactionCore) FinalTransactionAmount(amount float64, operationTypeID int, tx *gorm.DB) (float64, error) {
+func (core *TransactionCore) FinalTransactionAmount(logger *logrus.Entry, amount float64, operationTypeID int, tx *gorm.DB) (float64, error) {
 	// Fetch coefficient from the operation service
-	coef, err := core.operationClient.GetOperationCoefficient(operationTypeID, tx)
+	coef, err := core.operationClient.GetOperationCoefficient(logger, operationTypeID, tx)
 	if err != nil {
-		core.logger.Errorf("Error while fetching operation coefficient from operation service: %s", err.Error())
+		logger.Errorf("Error while fetching operation coefficient from operation service: %s", err.Error())
 		return amount, err
 	}
 
@@ -82,15 +82,15 @@ func (core *TransactionCore) FinalTransactionAmount(amount float64, operationTyp
 //
 // Returns:
 //   - error: If the account is not found or if there's an error in the account service call.
-func (core *TransactionCore) CheckAccountIdExist(accountId int, tx *gorm.DB) error {
+func (core *TransactionCore) CheckAccountIdExist(logger *logrus.Entry, accountId int, tx *gorm.DB) error {
 
-	account, err := core.accountClient.GetAccount(accountId, tx)
+	account, err := core.accountClient.GetAccount(logger, accountId, tx)
 	if err != nil {
-		core.logger.Errorf("Error while fetching account data from account service: %s", err.Error())
+		logger.Errorf("Error while fetching account data from account service: %s", err.Error())
 		return err
 	}
 	if account.Id == 0 { // account id not found in database
-		core.logger.Errorf("account_id: %d not found in database", accountId)
+		logger.Errorf("account_id: %d not found in database", accountId)
 		return fmt.Errorf("account_id: %d not found in database", accountId)
 	}
 	return nil
@@ -112,13 +112,13 @@ func (core *TransactionCore) CheckAccountIdExist(accountId int, tx *gorm.DB) err
 //   - A pointer to the newly created Transaction entity.
 //   - An encountered Error.
 
-func (core *TransactionCore) CreateTransaction(transactionPayload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error) {
-	core.logger.Info("CreateTransaction method called in transaction core layer.")
+func (core *TransactionCore) CreateTransaction(logger *logrus.Entry, transactionPayload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error) {
+	logger.Info("CreateTransaction method called in transaction core layer.")
 
 	// // 1. Validate the account_id exist in db
-	err := core.CheckAccountIdExist(transactionPayload.AccountId, tx)
+	err := core.CheckAccountIdExist(logger, transactionPayload.AccountId, tx)
 	if err != nil {
-		core.logger.Errorf("Error occured while doing validation on account id: %s", err.Error())
+		logger.Errorf("Error occured while doing validation on account id: %s", err.Error())
 		return &entityDbV1Package.Transaction{}, err
 	}
 
@@ -126,14 +126,14 @@ func (core *TransactionCore) CreateTransaction(transactionPayload *entityCoreV1P
 	transaction := mapperV1Package.TransactionMapper(transactionPayload)
 
 	// 3. Compute the final transaction amount
-	amount, err := core.FinalTransactionAmount(transaction.Amount, transaction.OperationTypeId, tx)
+	amount, err := core.FinalTransactionAmount(logger, transaction.Amount, transaction.OperationTypeId, tx)
 	if err != nil {
-		core.logger.Errorf("Error occured while computing final transaction amount by operation type: %s", err.Error())
+		logger.Errorf("Error occured while computing final transaction amount by operation type: %s", err.Error())
 		return transaction, err
 	}
 	transaction.Amount = amount
 
 	// 4. Persist the transaction in the DB
-	err = core.repoV1.CreateTransaction(transaction, tx)
+	err = core.repoV1.CreateTransaction(logger, transaction, tx)
 	return transaction, err
 }

@@ -5,6 +5,7 @@ import (
 	entityHttpV1Package "anti-fraud/account-service/entity/http/v1"
 	mapperV1Package "anti-fraud/account-service/mapper/v1"
 	repoV1Package "anti-fraud/account-service/repository/v1"
+	utilV1 "anti-fraud/utils-server/middleware/v1"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -59,13 +60,16 @@ func NewAccountController(
 //  5. Commit the txn on success (or rollback on error).
 //  6. Return a JSON response with the newly created account details.
 func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *http.Request) {
-	controller.logger.Info("CreateAccount endpoint called")
+	ctx := r.Context()
+	requestID := utilV1.GetRequestID(ctx)
+	logger := controller.logger.WithField("request_id", requestID)
+	logger.Info("CreateAccount endpoint called.")
 
 	// 1. Decode JSON request body.
 	var accountReq entityHttpV1Package.CreateAccountRequest
 	err := json.NewDecoder(r.Body).Decode(&accountReq)
 	if err != nil {
-		controller.logger.Errorf("Error decoding request body: %v", err)
+		logger.Errorf("Error decoding request body: %v", err)
 		http.Error(w, "Error decoding request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -73,7 +77,7 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 	// 2. Validate HTTP input payload.
 	err = accountReq.Validate()
 	if err != nil {
-		controller.logger.Errorf("Validation failed: %v", err)
+		logger.Errorf("Validation failed: %v", err)
 		http.Error(w, "Error: "+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -84,21 +88,21 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 
 	// 4. Create account using the core layer’s business logic.
 	accountPayload := mapperV1Package.CreateAccountPayloadMapper(&accountReq)
-	account, err := controller.coreV1.CreateAccount(accountPayload, tx)
+	account, err := controller.coreV1.CreateAccount(logger, accountPayload, tx)
 	if err != nil {
-		controller.logger.Errorf("Error creating account: %v", err)
+		logger.Errorf("Error creating account: %v", err)
 		http.Error(w, "An internal error occurred: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// 5. Commit txn.
 	if err := tx.Commit().Error; err != nil {
-		controller.logger.Errorf("Error committing transaction: %v", err)
+		logger.Errorf("Error committing transaction: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	controller.logger.Infof("Account created successfully: %v", account)
+	logger.Infof("Account created successfully: %v", account)
 
 	// 6. Build and send JSON response.
 	response := map[string]interface{}{
@@ -119,15 +123,18 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 //  5. Commit txn on success (or rollback on error).
 //  6. Return a JSON response with the account details.
 func (controller *AccountController) GetAccountDetails(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	requestID := utilV1.GetRequestID(ctx)
+	logger := controller.logger.WithField("request_id", requestID)
 	// 1. Extract the "accountId" from URL params.
 	params := mux.Vars(r)
 	accountIdStr := params["accountId"]
-	controller.logger.Infof("GetAccountDetails endpoint called for accountId: %v", accountIdStr)
+	logger.Infof("GetAccountDetails endpoint called for accountId: %v", accountIdStr)
 
 	// 2. Convert the ID to an integer.
 	accountId, err := strconv.Atoi(accountIdStr)
 	if err != nil {
-		controller.logger.Errorf("Error converting string to int: %v", err)
+		logger.Errorf("Error converting string to int: %v", err)
 		http.Error(w, "Error converting string to int: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -137,16 +144,16 @@ func (controller *AccountController) GetAccountDetails(w http.ResponseWriter, r 
 	defer tx.Rollback() // Rollback if we exit prematurely.
 
 	// 4. Fetch the account via core layer.
-	account, err := controller.coreV1.GetAccount(accountId, tx)
+	account, err := controller.coreV1.GetAccount(logger, accountId, tx)
 	if err != nil {
-		controller.logger.Errorf("Error fetching account details: %v", err)
+		logger.Errorf("Error fetching account details: %v", err)
 		http.Error(w, "An internal error occurred: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// 5. Commit txn.
 	if err := tx.Commit().Error; err != nil {
-		controller.logger.Errorf("Error committing transaction: %v", err)
+		logger.Errorf("Error committing transaction: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

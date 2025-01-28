@@ -15,10 +15,10 @@ import (
 type IAccountCore interface {
 
 	// CreateAccount creates a new account if the given document number is not already registered.
-	CreateAccount(accountPayload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error)
+	CreateAccount(logger *logrus.Entry, accountPayload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error)
 
 	// GetAccount retrieves an account by its unique ID.
-	GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error)
+	GetAccount(logger *logrus.Entry, accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error)
 }
 
 // AccountCore implements the IAccountCore interface, containing business logic for account operations.
@@ -48,19 +48,19 @@ func NewAccountCore(repoV1 repoV1Package.IAccountRepository, logger *logrus.Logg
 //   - A pointer to the newly created Account entity (or the duplicate if found).
 //   - An encountered Error.
 
-func (core *AccountCore) CreateAccount(accountPayload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error) {
-	core.logger.Info("CreateAccount method called in account core layer.")
+func (core *AccountCore) CreateAccount(logger *logrus.Entry, accountPayload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+	logger.Info("CreateAccount method called in account core layer.")
 
 	// 1. Check for an existing account with the same document number
-	accountFound, err := core.repoV1.CheckDuplicateAccount(accountPayload.DocumentNumber, tx)
+	accountFound, err := core.repoV1.CheckDuplicateAccount(logger, accountPayload.DocumentNumber, tx)
 	if err != nil {
-		core.logger.Errorf("Error occured while checking for duplicate account : %s", err.Error())
+		logger.Errorf("Error occured while checking for duplicate account : %s", err.Error())
 		return &entityDbV1Package.Account{}, err
 	}
 
 	// 2. If a duplicate exists, return it along with an error
 	if accountFound.ID > 0 {
-		core.logger.Errorf("Duplicate account found with document_number: %s", accountPayload.DocumentNumber)
+		logger.Errorf("Duplicate account found with document_number: %s", accountPayload.DocumentNumber)
 		return accountFound, fmt.Errorf("duplicate account found with document_number: %s", accountPayload.DocumentNumber)
 	}
 
@@ -68,7 +68,7 @@ func (core *AccountCore) CreateAccount(accountPayload *entityCoreV1Package.Creat
 	account := mapperV1Package.AccountMapper(accountPayload)
 
 	// 4. Create the new account record in the DB
-	err = core.repoV1.CreateAccount(account, tx)
+	err = core.repoV1.CreateAccount(logger, account, tx)
 	return account, err
 
 }
@@ -86,8 +86,8 @@ func (core *AccountCore) CreateAccount(accountPayload *entityCoreV1Package.Creat
 // Returns:
 //   - db entity Account.
 //   - An encountered Error.
-func (core *AccountCore) GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
-	core.logger.Info("GetAccount method called in account core layer.")
-	account, err := core.repoV1.GetAccount(accountId, tx)
+func (core *AccountCore) GetAccount(logger *logrus.Entry, accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+	logger.Info("GetAccount method called in account core layer.")
+	account, err := core.repoV1.GetAccount(logger, accountId, tx)
 	return account, err
 }

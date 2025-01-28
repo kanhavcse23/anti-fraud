@@ -21,7 +21,7 @@ type MockTransactionRepository struct {
 	mock.Mock
 }
 
-func (m *MockTransactionRepository) CreateTransaction(transaction *entityDbV1Package.Transaction, tx *gorm.DB) error {
+func (m *MockTransactionRepository) CreateTransaction(logger *logrus.Entry, transaction *entityDbV1Package.Transaction, tx *gorm.DB) error {
 	args := m.Called(transaction, tx)
 	return args.Error(0)
 }
@@ -30,7 +30,7 @@ type MockOperationClient struct {
 	mock.Mock
 }
 
-func (m *MockOperationClient) GetOperationCoefficient(operationTypeID int, tx *gorm.DB) (int, error) {
+func (m *MockOperationClient) GetOperationCoefficient(logger *logrus.Entry, operationTypeID int, tx *gorm.DB) (int, error) {
 	args := m.Called(operationTypeID, tx)
 	coef, _ := args.Get(0).(int)
 	return coef, args.Error(1)
@@ -43,7 +43,7 @@ type MockAccountClient struct {
 	mock.Mock
 }
 
-func (m *MockAccountClient) GetAccount(accountId int, tx *gorm.DB) (*accountClientPackageV1.Account, error) {
+func (m *MockAccountClient) GetAccount(logger *logrus.Entry, accountId int, tx *gorm.DB) (*accountClientPackageV1.Account, error) {
 	args := m.Called(accountId, tx)
 	acc, _ := args.Get(0).(*accountClientPackageV1.Account)
 	return acc, args.Error(1)
@@ -88,7 +88,7 @@ func TestFinalTransactionAmount_Success(t *testing.T) {
 	opMock.On("GetOperationCoefficient", 1, mock.Anything).
 		Return(3, nil)
 
-	amount, err := core.FinalTransactionAmount(100, 1, db)
+	amount, err := core.FinalTransactionAmount(logrus.NewEntry(logrus.New()), 100, 1, db)
 	assert.NoError(t, err)
 	assert.Equal(t, 300.0, amount)
 
@@ -101,7 +101,7 @@ func TestFinalTransactionAmount_Error(t *testing.T) {
 	opMock.On("GetOperationCoefficient", 2, mock.Anything).
 		Return(0.0, errors.New("operation client error"))
 
-	amount, err := core.FinalTransactionAmount(100, 2, db)
+	amount, err := core.FinalTransactionAmount(logrus.NewEntry(logrus.New()), 100, 2, db)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "operation client error")
 	assert.Equal(t, 100.0, amount)
@@ -119,7 +119,7 @@ func TestCheckAccountIdExist_Success(t *testing.T) {
 	accMock.On("GetAccount", 123, mock.Anything).
 		Return(&accountClientPackageV1.Account{Id: 123}, nil)
 
-	err := core.CheckAccountIdExist(123, db)
+	err := core.CheckAccountIdExist(logrus.NewEntry(logrus.New()), 123, db)
 	assert.NoError(t, err)
 
 	accMock.AssertExpectations(t)
@@ -131,7 +131,7 @@ func TestCheckAccountIdExist_NotFound(t *testing.T) {
 	accMock.On("GetAccount", 456, mock.Anything).
 		Return(&accountClientPackageV1.Account{Id: 0}, nil)
 
-	err := core.CheckAccountIdExist(456, db)
+	err := core.CheckAccountIdExist(logrus.NewEntry(logrus.New()), 456, db)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "account_id: 456 not found")
 
@@ -144,7 +144,7 @@ func TestCheckAccountIdExist_Error(t *testing.T) {
 	accMock.On("GetAccount", 789, mock.Anything).
 		Return((*accountClientPackageV1.Account)(nil), errors.New("db error"))
 
-	err := core.CheckAccountIdExist(789, db)
+	err := core.CheckAccountIdExist(logrus.NewEntry(logrus.New()), 789, db)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "db error")
 
@@ -180,7 +180,7 @@ func TestCreateTransaction_Success(t *testing.T) {
 	tx := db.Begin()
 	defer tx.Rollback()
 
-	transaction, err := core.CreateTransaction(payload, tx)
+	transaction, err := core.CreateTransaction(logrus.NewEntry(logrus.New()), payload, tx)
 	assert.NoError(t, err)
 	assert.NotNil(t, transaction)
 	assert.Equal(t, 1000.0, transaction.Amount)
@@ -205,7 +205,7 @@ func TestCreateTransaction_AccountNotFound(t *testing.T) {
 	tx := db.Begin()
 	defer tx.Rollback()
 
-	transaction, err := core.CreateTransaction(payload, tx)
+	transaction, err := core.CreateTransaction(logrus.NewEntry(logrus.New()), payload, tx)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "account_id: 999 not found")
 	assert.Equal(t, 0.0, transaction.Amount, "expect zero transaction returned or partial data")
@@ -233,7 +233,7 @@ func TestCreateTransaction_FinalAmountError(t *testing.T) {
 	tx := db.Begin()
 	defer tx.Rollback()
 
-	_, err := core.CreateTransaction(payload, tx)
+	_, err := core.CreateTransaction(logrus.NewEntry(logrus.New()), payload, tx)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "coef error")
 
@@ -262,7 +262,7 @@ func TestCreateTransaction_RepoError(t *testing.T) {
 	tx := db.Begin()
 	defer tx.Rollback()
 
-	_, err := core.CreateTransaction(payload, tx)
+	_, err := core.CreateTransaction(logrus.NewEntry(logrus.New()), payload, tx)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "repo create error")
 

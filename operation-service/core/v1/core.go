@@ -11,7 +11,7 @@ import (
 type IOperationCore interface {
 
 	// GetOperationCoefficient returns the coefficient for a given operation ID.
-	GetOperationCoefficient(operationId int, tx *gorm.DB) (int, error)
+	GetOperationCoefficient(logger *logrus.Entry, operationId int, tx *gorm.DB) (int, error)
 }
 
 // OperationCore implements IOperationCore interface.
@@ -39,10 +39,11 @@ func NewOperationCore(repoV1 repoV1Package.IOperationRepository, logger *logrus.
 // Returns:
 //   - int:   The coefficient associated with the operation type.
 //   - error: an encountered Error.
-func (core *OperationCore) GetOperationCoefficient(operationId int, tx *gorm.DB) (int, error) {
-	core.logger.Info("GetOperationCoefficient method called in operation core layer.")
-	operation, err := core.repoV1.GetOperation(operationId, tx)
+func (core *OperationCore) GetOperationCoefficient(logger *logrus.Entry, operationId int, tx *gorm.DB) (int, error) {
+	logger.Info("GetOperationCoefficient method called in operation core layer.")
+	operation, err := core.repoV1.GetOperation(logger, operationId, tx)
 	if err != nil {
+		logger.Errorf("Error occured while fetching coefficient associated with operationId (%d) : %s", operationId, err.Error())
 		return 0, err
 	}
 	return operation.Coefficient, nil

@@ -21,13 +21,13 @@ type MockAccountCore struct {
 	mock.Mock
 }
 
-func (m *MockAccountCore) CreateAccount(payload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+func (m *MockAccountCore) CreateAccount(logger *logrus.Entry, payload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	args := m.Called(payload, tx)
 	acc, _ := args.Get(0).(*entityDbV1Package.Account)
 	return acc, args.Error(1)
 }
 
-func (m *MockAccountCore) GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
+func (m *MockAccountCore) GetAccount(logger *logrus.Entry, accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	args := m.Called(accountId, tx)
 	acc, _ := args.Get(0).(*entityDbV1Package.Account)
 	return acc, args.Error(1)
@@ -48,7 +48,7 @@ func TestAccountClient_GetAccount_Success(t *testing.T) {
 	mockCore.On("GetAccount", accountId, mock.Anything).
 		Return(&entityDbV1Package.Account{Model: gorm.Model{ID: 123}, DocumentNumber: "ABC123"}, nil)
 
-	result, err := client.GetAccount(accountId, &gorm.DB{})
+	result, err := client.GetAccount(logrus.NewEntry(logrus.New()), accountId, &gorm.DB{})
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, 123, result.Id)
@@ -68,7 +68,7 @@ func TestAccountClient_GetAccount_Error(t *testing.T) {
 	mockCore.On("GetAccount", accountId, mock.Anything).
 		Return((*entityDbV1Package.Account)(nil), errors.New("db error"))
 
-	result, err := client.GetAccount(accountId, &gorm.DB{})
+	result, err := client.GetAccount(logrus.NewEntry(logrus.New()), accountId, &gorm.DB{})
 	assert.Error(t, err)
 	assert.Equal(t, int(result.Id), 0)
 
@@ -84,7 +84,7 @@ func TestAccountClient_SetupCore(t *testing.T) {
 	mockCore.On("GetAccount", 1, mock.Anything).
 		Return(&entityDbV1Package.Account{Model: gorm.Model{ID: 1}}, nil)
 
-	res, err := client.GetAccount(1, &gorm.DB{})
+	res, err := client.GetAccount(logrus.NewEntry(logrus.New()), 1, &gorm.DB{})
 	assert.NoError(t, err)
 	assert.Equal(t, 1, res.Id)
 

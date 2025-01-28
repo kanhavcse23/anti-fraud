@@ -6,6 +6,8 @@ import (
 	mapperV1Package "anti-fraud/transaction-service/mapper/v1"
 	repoV1Package "anti-fraud/transaction-service/repository/v1"
 
+	utilV1 "anti-fraud/utils-server/middleware/v1"
+
 	"github.com/sirupsen/logrus"
 
 	"encoding/json"
@@ -44,13 +46,16 @@ func NewTransactionController(repoV1 repoV1Package.ITransactionRepository, coreV
 //  5. Commit db txn.
 //  6. Return http response with the newly created transaction.
 func (controller *TransactionController) CreateTransaction(w http.ResponseWriter, r *http.Request) {
-	controller.logger.Info("CreateTransaction endpoint called")
+	ctx := r.Context()
+	requestID := utilV1.GetRequestID(ctx)
+	logger := controller.logger.WithField("request_id", requestID)
+	logger.Info("CreateTransaction endpoint called")
 	var transactionReq entityHttpV1Package.CreateTransactionRequest
 
 	// 1. Decode HTTP input payload.
 	err := json.NewDecoder(r.Body).Decode(&transactionReq)
 	if err != nil {
-		controller.logger.Errorf("Error decoding request body: %v", err)
+		logger.Errorf("Error decoding request body: %v", err)
 		http.Error(w, "Error decoding request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -58,7 +63,7 @@ func (controller *TransactionController) CreateTransaction(w http.ResponseWriter
 	// 2. Validate payload.
 	err = transactionReq.Validate()
 	if err != nil {
-		controller.logger.Errorf("Error: %v", err)
+		logger.Errorf("Error: %v", err)
 		http.Error(w, "Error: "+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -68,22 +73,22 @@ func (controller *TransactionController) CreateTransaction(w http.ResponseWriter
 	defer tx.Rollback()
 
 	// 4. Create a new transaction via the core layer.
-	transaction, err := controller.coreV1.CreateTransaction(mapperV1Package.CreateTransactionPayloadMapper(&transactionReq), tx)
+	transaction, err := controller.coreV1.CreateTransaction(logger, mapperV1Package.CreateTransactionPayloadMapper(&transactionReq), tx)
 	if err != nil {
-		controller.logger.Errorf("Error creating transaction: %v", err)
+		logger.Errorf("Error creating transaction: %v", err)
 		http.Error(w, "An internal error occurred"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Commit db txn
 	if err := tx.Commit().Error; err != nil {
-		controller.logger.Errorf("Error committing transaction: %v", err)
+		logger.Errorf("Error committing transaction: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// 6. Build and send http response.
-	controller.logger.Infof("Transaction created successfully: %v", transaction)
+	logger.Infof("Transaction created successfully: %v", transaction)
 	response := map[string]interface{}{
 		"success":     true,
 		"transaction": mapperV1Package.TransactionDetailsResponseMapper(transaction),

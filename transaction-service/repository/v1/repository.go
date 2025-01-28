@@ -12,7 +12,7 @@ import (
 type ITransactionRepository interface {
 
 	// CreateTransaction persists a Transaction entity to the db.
-	CreateTransaction(transaction *entityDbV1Package.Transaction, tx *gorm.DB) error
+	CreateTransaction(logger *logrus.Entry, transaction *entityDbV1Package.Transaction, tx *gorm.DB) error
 }
 
 // TransactionRepository implements the ITransactionRepository interface.
@@ -38,11 +38,11 @@ func NewTransactionRepository(logger *logrus.Logger) *TransactionRepository {
 //
 // Returns:
 //   - error: an encountered Error. else return nil.
-func (repo *TransactionRepository) CreateTransaction(transaction *entityDbV1Package.Transaction, tx *gorm.DB) error {
-	repo.logger.Info("CreateTransaction method called in transaction repo layer.")
+func (repo *TransactionRepository) CreateTransaction(logger *logrus.Entry, transaction *entityDbV1Package.Transaction, tx *gorm.DB) error {
+	logger.Info("CreateTransaction method called in transaction repo layer.")
 	result := tx.Table(constantPackage.TABLE_NAME).Create(transaction)
 	if result.Error != nil {
-		repo.logger.Errorf("Failed to create account: %v", result.Error)
+		logger.Errorf("Failed to create account: %v", result.Error)
 	}
 	return result.Error
 }

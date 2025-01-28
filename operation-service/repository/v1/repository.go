@@ -13,7 +13,7 @@ import (
 type IOperationRepository interface {
 
 	// GetOperation retrieves the operation record by its unique ID.
-	GetOperation(operationId int, tx *gorm.DB) (*entityDbV1Package.Operation, error)
+	GetOperation(logger *logrus.Entry, operationId int, tx *gorm.DB) (*entityDbV1Package.Operation, error)
 }
 
 // OperationRepository implements IOperationRepository interface.
@@ -40,12 +40,15 @@ func NewOperationRepository(logger *logrus.Logger) *OperationRepository {
 // Returns:
 //   - A pointer to the retrieved Operation entity.
 //   - An encountered Error.
-func (repo *OperationRepository) GetOperation(operationId int, tx *gorm.DB) (*entityDbV1Package.Operation, error) {
-	repo.logger.Info("GetOperation method called in operation repo layer.")
+func (repo *OperationRepository) GetOperation(logger *logrus.Entry, operationId int, tx *gorm.DB) (*entityDbV1Package.Operation, error) {
+	logger.Info("GetOperation method called in operation repo layer.")
 	var operation entityDbV1Package.Operation
 	result := tx.Table(constantPackage.TABLE_NAME).First(&operation, operationId)
 	if result.Error != nil && result.Error == gorm.ErrRecordNotFound {
+		logger.Errorf("operation id=%d not found in database", operationId)
 		return &operation, fmt.Errorf("operation id: %d not found in database", operationId)
+	} else if result.Error != nil {
+		logger.Errorf("Error occured while running GET query on db: %s", result.Error.Error())
 	}
 	return &operation, result.Error
 }
