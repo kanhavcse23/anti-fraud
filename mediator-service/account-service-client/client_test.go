@@ -7,6 +7,7 @@ import (
 
 	entityCoreV1Package "anti-fraud/account-service/entity/core/v1"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
@@ -37,7 +38,8 @@ func (m *MockAccountCore) GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Pac
 //-------------------------------------------//
 
 func TestAccountClient_GetAccount_Success(t *testing.T) {
-	client := NewAccountClient()
+	logger := logrus.New()
+	client := NewAccountClient(logger)
 	mockCore := new(MockAccountCore)
 
 	client.SetupCore(mockCore)
@@ -56,7 +58,8 @@ func TestAccountClient_GetAccount_Success(t *testing.T) {
 }
 
 func TestAccountClient_GetAccount_Error(t *testing.T) {
-	client := NewAccountClient()
+	logger := logrus.New()
+	client := NewAccountClient(logger)
 	mockCore := new(MockAccountCore)
 
 	client.SetupCore(mockCore)
@@ -73,7 +76,8 @@ func TestAccountClient_GetAccount_Error(t *testing.T) {
 }
 
 func TestAccountClient_SetupCore(t *testing.T) {
-	client := NewAccountClient()
+	logger := logrus.New()
+	client := NewAccountClient(logger)
 	mockCore := new(MockAccountCore)
 
 	client.SetupCore(mockCore)

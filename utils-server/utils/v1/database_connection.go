@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-func EstablishPostgresqlDBConnection() (*gorm.DB, error) {
+func EstablishDBConnection() (*gorm.DB, error) {
 
 	config, err := configPackage.LoadConfig()
 	if err != nil {

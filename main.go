@@ -25,16 +25,16 @@ func main() {
 
 	router := mux.NewRouter()
 
-	db, err := dbConnPackage.EstablishPostgresqlDBConnection()
+	db, err := dbConnPackage.EstablishDBConnection()
 	if err != nil {
 		log.Fatal(err)
 	}
 	// Configure Client
 
 	//Operation Client
-	operationClient := operationClientV1Package.NewOperationClient()
+	operationClient := operationClientV1Package.NewOperationClient(logger)
 	//Operation Client
-	accountClient := accountClientV1Package.NewAccountClient()
+	accountClient := accountClientV1Package.NewAccountClient(logger)
 	//configure account service
 	accountManagerV1 := account_manager_v1.NewAccountManager(db, router, logger)
 	accountManagerV1.Init()

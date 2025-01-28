@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
@@ -28,7 +29,8 @@ func (m *MockOperationCore) GetOperationCoefficient(operationId int, tx *gorm.DB
 //-------------------------------------------//
 
 func TestOperationClient_GetOperationCoefficient_Success(t *testing.T) {
-	client := NewOperationClient()
+	logger := logrus.New()
+	client := NewOperationClient(logger)
 	mockCore := new(MockOperationCore)
 
 	client.SetupCore(mockCore)
@@ -44,7 +46,8 @@ func TestOperationClient_GetOperationCoefficient_Success(t *testing.T) {
 }
 
 func TestOperationClient_GetOperationCoefficient_Error(t *testing.T) {
-	client := NewOperationClient()
+	logger := logrus.New()
+	client := NewOperationClient(logger)
 	mockCore := new(MockOperationCore)
 
 	client.SetupCore(mockCore)
@@ -60,7 +63,8 @@ func TestOperationClient_GetOperationCoefficient_Error(t *testing.T) {
 }
 
 func TestOperationClient_SetupCore(t *testing.T) {
-	client := NewOperationClient()
+	logger := logrus.New()
+	client := NewOperationClient(logger)
 	mockCore := new(MockOperationCore)
 	client.SetupCore(mockCore)
 
