@@ -44,30 +44,30 @@ Project employs a microservices architecture, primarily developed in Go, to ensu
         - "source run.sh"
 
 - Manual Installation:
-    To set up the Project System locally, follow these steps:
+    - To set up the Project System locally, follow these steps:
 
-    Clone the Repository:
+    - Clone the Repository:
         - "git clone https://github.com/kanhavcse23/anti-fraud.git"
         - "cd anti-fraud"
 
-    Set Up Environment Variables:
-        Create a .env file in the root directory and configure the necessary environment variables for database connections and service configurations.
+    - Set Up Environment Variables:
+        - Create a .env file in the root directory and configure the necessary environment variables for database connections and service configurations.
 
-    Run Database Migrations:
-        Ensure that your database is set up and accessible. Then, run the migration scripts located in the database/migration/ directory to set up the necessary tables and schemas.
+    - Run Database Migrations:
+        - Ensure that your database is set up and accessible. Then, run the migration scripts located in the database/migration/ directory to set up the necessary tables and schemas.
 
-    Build and Run Services:
+    - Build and Run Services:
         "docker-compose up --build"
 
 - Usage:
-    Once all services are up and running, you can interact with them using API clients like Postman.
+    - Once all services are up and running, you can interact with them using API clients like Postman.
 
-    Account Service:
-    - Create Account: POST /accounts, JSON BODY: {"document_number": <DOCUMENT_NUMBER>}
-    - Get Account Details: GET /accounts/{accountId}
+    - Account Service:
+        - Create Account: POST /accounts, JSON BODY: {"document_number": <DOCUMENT_NUMBER>}
+        - Get Account Details: GET /accounts/{accountId}
 
-    Transaction Service:
-    - Create Transaction: POST /transactions, JSON BODY: {"account_id": <ACC_ID>, "operation_type_id": <OP_ID>, "amount": <AMOUNT>}
+    - Transaction Service:
+        - Create Transaction: POST /transactions, JSON BODY: {"account_id": <ACC_ID>, "operation_type_id": <OP_ID>, "amount": <AMOUNT>}
 
 - Testing:
     To run tests for the services, use the following command:
