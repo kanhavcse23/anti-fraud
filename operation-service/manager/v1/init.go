@@ -20,7 +20,7 @@ func NewOperationManager(logger *logrus.Logger) *OperationManager {
 	return &OperationManager{logger: logger}
 }
 
-// Init wire all components, register routes for operation-service.
+// Init instantiate and wire all components, register routes for operation-service.
 func (mw *OperationManager) Init() {
 	repoV1 := repoV1Package.NewOperationRepository(mw.logger)
 	mw.coreV1 = coreV1Package.NewOperationCore(repoV1, mw.logger)

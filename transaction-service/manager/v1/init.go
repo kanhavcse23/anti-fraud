@@ -30,7 +30,7 @@ func NewTransactionManager(db *gorm.DB, router *mux.Router, logger *logrus.Logge
 	return &TransactionManager{db: db, router: router, logger: logger, operationClient: operationClient, accountClient: accountClient}
 }
 
-// Init wire all components, register routes for transaction-service.
+// Init instantiate and wire all components, register routes for transaction-service.
 func (mw *TransactionManager) Init() {
 
 	middlewareHandler := middlewareHandlerPackageV1.NewMiddlewareHandler(mw.logger)

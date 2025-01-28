@@ -28,7 +28,7 @@ func NewAccountManager(db *gorm.DB, router *mux.Router, logger *logrus.Logger) *
 	return &AccountManager{db: db, router: router, logger: logger}
 }
 
-// Init wire all components, register routes for account-service.
+// Init instantiate and wire all components, register routes for account-service.
 func (mw *AccountManager) Init() {
 
 	managerHandler := middlewareHandlerPackageV1.NewMiddlewareHandler(mw.logger)

@@ -31,7 +31,7 @@ Project employs a microservices architecture, primarily developed in Go, to ensu
     - Mediator Service: Acts as an intermediary to facilitate communication between services via Mediator Pattern.
 
     Service Layers for each service:    
-    - manager layer: Responsible to wire all components required to run corresponding service.
+    - manager layer: Responsible for instantiate and wire all components required to run corresponding service.
     - route layer: Responsible for registering all routes for corresponding service.
     - controller layer: Responsible for defining methods for all HTTP handlers for corresponding service.
     - core layer: Resposible for defining core business logic for corresponding service.
