@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS idx_account_document_number;
