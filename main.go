@@ -4,8 +4,6 @@ import (
 	account_manager_v1 "anti-fraud/account-service/manager/v1"
 	operation_manager_v1 "anti-fraud/operation-service/manager/v1"
 	transaction_manager_v1 "anti-fraud/transaction-service/manager/v1"
-	"fmt"
-	"log"
 	"net/http"
 
 	operationClientV1Package "anti-fraud/mediator-service/operation-service-client"
@@ -28,7 +26,7 @@ func main() {
 	// Establish db connection
 	db, err := dbConnPackage.EstablishDBConnection()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatalf("Error: %v", err)
 	}
 
 	// Operation Client
@@ -54,6 +52,6 @@ func main() {
 	logger.Info("All components has been wired.")
 
 	if err := http.ListenAndServe(":8080", router); err != nil {
-		fmt.Printf("Failed to start server: %v\n", err)
+		logger.Fatalf("Failed to start server: %v\n", err)
 	}
 }
