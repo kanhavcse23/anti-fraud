@@ -30,13 +30,14 @@ Project employs a microservices architecture, primarily developed in Go, to ensu
     - Operation Service: Manages operation types.
     - Mediator Service: Acts as an intermediary to facilitate communication between services via Mediator Pattern.
 
-    Layers in each service:    
+    Service Layers for each service:    
     - manager layer: Responsible to wire all components required to run corresponding service.
     - route layer: Responsible for registering all routes for corresponding service.
     - controller layer: Responsible for defining methods for all HTTP handlers for corresponding service.
     - core layer: Resposible for defining core business logic for corresponding service.
     - repository layer: Responsible for performing db operation for corresponding service.
     - entity layer: Responsible for defining all objects(structs) required in corresponding service.
+    - mapper layer: Responsible for converting map data to another format via adapter pattern.
 
     main.go: Responsible to configure every component required to run project.
 
