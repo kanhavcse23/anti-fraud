@@ -47,6 +47,9 @@ func NewAccountRepository(logger *logrus.Logger) *AccountRepository {
 func (repo *AccountRepository) CreateAccount(account *entityDbV1Package.Account, tx *gorm.DB) error {
 	repo.logger.Info("CreateAccount method called in account repo layer.")
 	result := tx.Table(constantPackage.TABLE_NAME).Create(account)
+	if result.Error != nil {
+		repo.logger.Errorf("Failed to create account: %v", result.Error)
+	}
 	return result.Error
 }
 
@@ -69,6 +72,7 @@ func (repo *AccountRepository) GetAccount(accountId int, tx *gorm.DB) (*entityDb
 	var account entityDbV1Package.Account
 	result := tx.Table(constantPackage.TABLE_NAME).First(&account, accountId)
 	if result.Error != nil && result.Error == gorm.ErrRecordNotFound {
+		repo.logger.Error("Failed to find account")
 		return &account, nil
 	}
 	return &account, result.Error
@@ -95,6 +99,7 @@ func (repo *AccountRepository) CheckDuplicateAccount(documentNumber string, tx *
 	result := tx.Table(constantPackage.TABLE_NAME).
 		Where("document_number = ?", documentNumber).First(&account)
 	if result.Error != nil && result.Error == gorm.ErrRecordNotFound { // account doesn't exist with `documentNumber`
+		repo.logger.Errorf("Failed to find account")
 		return &account, nil
 	}
 	return &account, result.Error

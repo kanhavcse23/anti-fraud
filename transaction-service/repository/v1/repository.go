@@ -41,5 +41,8 @@ func NewTransactionRepository(logger *logrus.Logger) *TransactionRepository {
 func (repo *TransactionRepository) CreateTransaction(transaction *entityDbV1Package.Transaction, tx *gorm.DB) error {
 	repo.logger.Info("CreateTransaction method called in transaction repo layer.")
 	result := tx.Table(constantPackage.TABLE_NAME).Create(transaction)
+	if result.Error != nil {
+		repo.logger.Errorf("Failed to create account: %v", result.Error)
+	}
 	return result.Error
 }
