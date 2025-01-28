@@ -65,7 +65,7 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 	var accountReq entityHttpV1Package.CreateAccountRequest
 	err := json.NewDecoder(r.Body).Decode(&accountReq)
 	if err != nil {
-		controller.logger.Warningf("Error decoding request body: %v", err)
+		controller.logger.Errorf("Error decoding request body: %v", err)
 		http.Error(w, "Error decoding request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -73,7 +73,7 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 	// 2. Validate HTTP input payload.
 	err = accountReq.Validate()
 	if err != nil {
-		controller.logger.Warningf("Validation failed: %v", err)
+		controller.logger.Errorf("Validation failed: %v", err)
 		http.Error(w, "Error: "+err.Error(), http.StatusBadRequest)
 		return
 	}

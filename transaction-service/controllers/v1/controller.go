@@ -50,7 +50,7 @@ func (controller *TransactionController) CreateTransaction(w http.ResponseWriter
 	// 1. Decode HTTP input payload.
 	err := json.NewDecoder(r.Body).Decode(&transactionReq)
 	if err != nil {
-		controller.logger.Warningf("Error decoding request body: %v", err)
+		controller.logger.Errorf("Error decoding request body: %v", err)
 		http.Error(w, "Error decoding request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -58,7 +58,7 @@ func (controller *TransactionController) CreateTransaction(w http.ResponseWriter
 	// 2. Validate payload.
 	err = transactionReq.Validate()
 	if err != nil {
-		controller.logger.Warningf("Error: %v", err)
+		controller.logger.Errorf("Error: %v", err)
 		http.Error(w, "Error: "+err.Error(), http.StatusBadRequest)
 		return
 	}

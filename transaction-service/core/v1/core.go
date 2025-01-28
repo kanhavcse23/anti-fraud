@@ -62,6 +62,7 @@ func (core *TransactionCore) FinalTransactionAmount(amount float64, operationTyp
 	// Fetch coefficient from the operation service
 	coef, err := core.operationClient.GetOperationCoefficient(operationTypeID, tx)
 	if err != nil {
+		core.logger.Errorf("Error while fetching operation coefficient from operation service: %s", err.Error())
 		return amount, err
 	}
 
@@ -85,9 +86,11 @@ func (core *TransactionCore) CheckAccountIdExist(accountId int, tx *gorm.DB) err
 
 	account, err := core.accountClient.GetAccount(accountId, tx)
 	if err != nil {
+		core.logger.Errorf("Error while fetching account data from account service: %s", err.Error())
 		return err
 	}
 	if account.Id == 0 { // account id not found in database
+		core.logger.Errorf("account_id: %d not found in database", accountId)
 		return fmt.Errorf("account_id: %d not found in database", accountId)
 	}
 	return nil
@@ -115,6 +118,7 @@ func (core *TransactionCore) CreateTransaction(transactionPayload *entityCoreV1P
 	// // 1. Validate the account_id exist in db
 	err := core.CheckAccountIdExist(transactionPayload.AccountId, tx)
 	if err != nil {
+		core.logger.Errorf("Error occured while doing validation on account id: %s", err.Error())
 		return &entityDbV1Package.Transaction{}, err
 	}
 
@@ -124,6 +128,7 @@ func (core *TransactionCore) CreateTransaction(transactionPayload *entityCoreV1P
 	// 3. Compute the final transaction amount
 	amount, err := core.FinalTransactionAmount(transaction.Amount, transaction.OperationTypeId, tx)
 	if err != nil {
+		core.logger.Errorf("Error occured while computing final transaction amount by operation type: %s", err.Error())
 		return transaction, err
 	}
 	transaction.Amount = amount

@@ -54,12 +54,14 @@ func (core *AccountCore) CreateAccount(accountPayload *entityCoreV1Package.Creat
 	// 1. Check for an existing account with the same document number
 	accountFound, err := core.repoV1.CheckDuplicateAccount(accountPayload.DocumentNumber, tx)
 	if err != nil {
+		core.logger.Errorf("Error occured while checking for duplicate account : %s", err.Error())
 		return &entityDbV1Package.Account{}, err
 	}
 
 	// 2. If a duplicate exists, return it along with an error
 	if accountFound.ID > 0 {
-		return accountFound, fmt.Errorf("Duplicate account found with document_number: %s", accountPayload.DocumentNumber)
+		core.logger.Errorf("Duplicate account found with document_number: %s", accountPayload.DocumentNumber)
+		return accountFound, fmt.Errorf("duplicate account found with document_number: %s", accountPayload.DocumentNumber)
 	}
 
 	// 3. Map the incoming payload to a DB entity
