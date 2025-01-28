@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// IAccountCore describes the core use cases for handling account operations.
+// IAccountCore defines the methods interface for handling account operations.
 type IAccountCore interface {
 
 	// CreateAccount creates a new account if the given document number is not already registered.
@@ -19,7 +19,7 @@ type IAccountCore interface {
 	CreateAccount(accountPayload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error)
 
 	// GetAccount retrieves an account by its unique ID.
-	// It returns the matching account or an error if no account is found or a DB error occurs.
+	// It returns found account or an encountered Error.
 	GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error)
 }
 
@@ -29,7 +29,7 @@ type AccountCore struct {
 	logger *logrus.Logger
 }
 
-// NewAccountCore constructs and returns a new AccountCore instance.
+// NewAccountCore cretae new AccountCore instance.
 func NewAccountCore(repoV1 repoV1Package.IAccountRepository, logger *logrus.Logger) *AccountCore {
 	return &AccountCore{repoV1: repoV1, logger: logger}
 }
@@ -40,18 +40,19 @@ func NewAccountCore(repoV1 repoV1Package.IAccountRepository, logger *logrus.Logg
 //   1. Checks if an account with the same document number already exists via the repository.
 //   2. If a duplicate is found, it returns that existing account and an error indicating a duplicate.
 //   3. Otherwise, maps the request payload to a DB entity and creates a new account record.
-//   4. Returns the created account and any error that occurred during creation.
+//   4. Returns the created account and Error if occured.
 //
 // Parameters:
-//   - accountPayload: Holds the new account details (e.g., DocumentNumber).
-//   - tx: The GORM transaction within which to perform the DB operations.
+//   - accountPayload: Holds the new account details.
+//   - tx: db txn.
 //
 // Returns:
 //   - A pointer to the newly created Account entity (or the duplicate if found).
-//   - An error if the account cannot be created or if a duplicate is detected.
+//   - An encountered Error.
 
 func (core *AccountCore) CreateAccount(accountPayload *entityCoreV1Package.CreateAccountPayload, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	core.logger.Info("CreateAccount method called in account core layer.")
+
 	// 1. Check for an existing account with the same document number
 	accountFound, err := core.repoV1.CheckDuplicateAccount(accountPayload.DocumentNumber, tx)
 	if err != nil {
@@ -76,15 +77,15 @@ func (core *AccountCore) CreateAccount(accountPayload *entityCoreV1Package.Creat
 //
 // Steps:
 //  1. Delegates to the repository to fetch the account.
-//  2. Returns the account if found, or an error if not found or if any DB issue occurs.
+//  2. Returns the account if found, or an error if not found or if any issue occurs.
 //
 // Parameters:
-//   - accountId: The ID of the account to retrieve.
-//   - tx: The GORM transaction for database operations.
+//   - accountId: ID of the account to retrieve.
+//   - tx: db txn.
 //
 // Returns:
-//   - The Account entity if located.
-//   - An error if retrieval fails or if no record exists for the given ID.
+//   - db entity Account.
+//   - An encountered Error.
 func (core *AccountCore) GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	core.logger.Info("GetAccount method called in account core layer.")
 	account, err := core.repoV1.GetAccount(accountId, tx)

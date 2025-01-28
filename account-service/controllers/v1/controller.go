@@ -15,21 +15,23 @@ import (
 	"net/http"
 )
 
-// IAccountController defines the contract for account-related HTTP handlers.
+// IAccountController defines the methods interface for account-related HTTP handlers.
 type IAccountController interface {
+
 	// CreateAccount handles the creation of a new account.
 	CreateAccount(w http.ResponseWriter, r *http.Request)
+
 	// GetAccountDetails retrieves the details of an existing account by its ID.
 	GetAccountDetails(w http.ResponseWriter, r *http.Request)
 }
 
-// AccountController provides HTTP handlers for account-related operations.
-// It delegates business logic to IAccountCore and persistence tasks to IAccountRepository.
+// AccountController implements IAccountController interface and
+// provides HTTP handlers for account-related operations.
 type AccountController struct {
 	repoV1 repoV1Package.IAccountRepository // Repository for lower-level DB operations
 	coreV1 coreV1Package.IAccountCore       // Core layer providing business logic.
-	db     *gorm.DB                         // GORM DB instance for transaction management.
-	logger *logrus.Logger                   // Logger for capturing logs and debug information.
+	db     *gorm.DB
+	logger *logrus.Logger
 }
 
 // NewAccountController creates and returns a new AccountController initialized.
@@ -52,9 +54,9 @@ func NewAccountController(
 // Workflow:
 //  1. Decode the incoming JSON payload into CreateAccountRequest.
 //  2. Validate the request payload.
-//  3. Begin a database transaction.
+//  3. Begin db txn.
 //  4. Invoke the core layer to create the account (business logic).
-//  5. Commit the transaction on success (or rollback on error, deferred).
+//  5. Commit the txn on success (or rollback on error).
 //  6. Return a JSON response with the newly created account details.
 func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	controller.logger.Info("CreateAccount endpoint called")
@@ -111,10 +113,10 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 //
 // Workflow:
 //  1. Extract the "accountId" from the URL path using Gorilla Mux.
-//  2. Convert the ID to an integer.
-//  3. Begin a database transaction.
+//  2. Convert the accountId from string to an int.
+//  3. Begin db txn.
 //  4. Retrieve the account from the core layer.
-//  5. Commit the transaction on success (or rollback on error, deferred).
+//  5. Commit txn on success (or rollback on error).
 //  6. Return a JSON response with the account details.
 func (controller *AccountController) GetAccountDetails(w http.ResponseWriter, r *http.Request) {
 	// 1. Extract the "accountId" from URL params.

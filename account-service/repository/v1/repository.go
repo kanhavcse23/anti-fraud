@@ -9,9 +9,10 @@ import (
 	"gorm.io/gorm"
 )
 
-// IAccountRepository defines interface account-related db operations.
+// IAccountRepository defines methods interface for account-related db operations.
 type IAccountRepository interface {
-	// CreateAccount persists a new account record to the database.
+
+	// CreateAccount persists a new account record to the db.
 	CreateAccount(account *entityDbV1Package.Account, tx *gorm.DB) error
 
 	// GetAccount retrieves an account by its unique ID.
@@ -35,7 +36,7 @@ func NewAccountRepository(logger *logrus.Logger) *AccountRepository {
 //
 // Steps:
 //  1. Perform an INSERT operation on the account table.
-//  3. Returns any error encountered during the insertion, or nil if successful.
+//  3. Returns any error encountered during the insertion.
 //
 // Parameters:
 //   - account: account db entity.

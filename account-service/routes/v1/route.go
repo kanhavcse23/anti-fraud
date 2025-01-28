@@ -14,11 +14,13 @@ type AccountRoutes struct {
 	middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler
 }
 
+// NewAccountRoutes create and return an instance of AccountRoutes.
 func NewAccountRoutes(controller controllerV1Package.IAccountController, router *mux.Router, middlewareHandler *middlewareHandlerPackageV1.MiddlewareHandler) *AccountRoutes {
 	return &AccountRoutes{controller: controller, muxRouter: router, middlewareHandler: middlewareHandler}
 
 }
 
+// Init register route for account-service.
 func (routes *AccountRoutes) Init() {
 	handlerFunc := routes.middlewareHandler.MiddlewareHandlerFunc
 

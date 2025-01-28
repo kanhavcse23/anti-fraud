@@ -25,26 +25,28 @@ func main() {
 
 	router := mux.NewRouter()
 
+	// Establish db connection
 	db, err := dbConnPackage.EstablishDBConnection()
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Configure Client
 
-	//Operation Client
+	// Operation Client
 	operationClient := operationClientV1Package.NewOperationClient(logger)
-	//Operation Client
+
+	// Account Client
 	accountClient := accountClientV1Package.NewAccountClient(logger)
-	//configure account service
+
+	// Account Service
 	accountManagerV1 := account_manager_v1.NewAccountManager(db, router, logger)
 	accountManagerV1.Init()
 	accountManagerV1.ConfigureClient(accountClient)
 
-	//configure transaction service
+	// Transaction Service
 	transactionManagerV1 := transaction_manager_v1.NewTransactionManager(db, router, logger, operationClient, accountClient)
 	transactionManagerV1.Init()
 
-	//configure operation service
+	// Operation Service
 	operationManagerV1 := operation_manager_v1.NewOperationManager(logger)
 	operationManagerV1.Init()
 	operationManagerV1.ConfigureClient(operationClient)

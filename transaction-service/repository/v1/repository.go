@@ -20,7 +20,7 @@ type TransactionRepository struct {
 	logger *logrus.Logger
 }
 
-// NewTransactionRepository return new TransactionRepository instance.
+// NewTransactionRepository creates and return new TransactionRepository instance.
 func NewTransactionRepository(logger *logrus.Logger) *TransactionRepository {
 
 	return &TransactionRepository{logger: logger}

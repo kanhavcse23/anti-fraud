@@ -30,8 +30,8 @@ func NewOperationRepository(logger *logrus.Logger) *OperationRepository {
 // GetOperation finds an operation record based on the provided operationId.
 //
 // Steps:
-//  1. Query table (constantPackage.TABLE_NAME) to
-//     first record matching the given operationId (primary key).
+//  1. Query table (constantPackage.TABLE_NAME) to first record matching the
+//     given operationId (primary key).
 //  3. If no record is found, returns a "not found" error.
 //  4. Otherwise returns the operation record and any error encountered.
 //

@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// ITransactionController defines the HTTP handler interface.
+// ITransactionController defines methods interface for HTTP handler.
 type ITransactionController interface {
 
 	// CreateTransaction handles an HTTP request to create a new transaction.
@@ -29,12 +29,12 @@ type TransactionController struct {
 	logger *logrus.Logger
 }
 
-// NewTransactionController returns new TransactionController instance.
+// NewTransactionController creates and returns new TransactionController instance.
 func NewTransactionController(repoV1 repoV1Package.ITransactionRepository, coreV1 coreV1Package.ITransactionCore, db *gorm.DB, logger *logrus.Logger) *TransactionController {
 	return &TransactionController{repoV1: repoV1, coreV1: coreV1, db: db, logger: logger}
 }
 
-// CreateTransaction handles the HTTP POST request for creating a new transaction.
+// CreateTransaction handles the HTTP request for creating a new transaction.
 //
 // Workflow:
 //  1. Parse the JSON request body into a CreateTransactionRequest struct.
@@ -47,7 +47,7 @@ func (controller *TransactionController) CreateTransaction(w http.ResponseWriter
 	controller.logger.Info("CreateTransaction endpoint called")
 	var transactionReq entityHttpV1Package.CreateTransactionRequest
 
-	// 1. Decode HTTP payload into a CreateTransactionRequest.
+	// 1. Decode HTTP input payload.
 	err := json.NewDecoder(r.Body).Decode(&transactionReq)
 	if err != nil {
 		controller.logger.Warningf("Error decoding request body: %v", err)
@@ -55,7 +55,7 @@ func (controller *TransactionController) CreateTransaction(w http.ResponseWriter
 		return
 	}
 
-	// 2. Validate the decoded payload.
+	// 2. Validate payload.
 	err = transactionReq.Validate()
 	if err != nil {
 		controller.logger.Warningf("Error: %v", err)

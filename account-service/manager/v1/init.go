@@ -14,6 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// AccountManager wires all components required to run account-service.
 type AccountManager struct {
 	db     *gorm.DB
 	router *mux.Router
@@ -21,10 +22,13 @@ type AccountManager struct {
 	coreV1 coreV1Package.IAccountCore
 }
 
+// NewAccountManager create and return new instance of AccountManager.
 func NewAccountManager(db *gorm.DB, router *mux.Router, logger *logrus.Logger) *AccountManager {
 
 	return &AccountManager{db: db, router: router, logger: logger}
 }
+
+// Init wire all components, register routes for account-service.
 func (mw *AccountManager) Init() {
 
 	managerHandler := middlewareHandlerPackageV1.NewMiddlewareHandler(mw.logger)
@@ -35,6 +39,7 @@ func (mw *AccountManager) Init() {
 	router.Init()
 }
 
+// ConfigureClient configure core instance of account service in account-client.
 func (mw *AccountManager) ConfigureClient(client clientV1Package.IAccountClient) {
 	client.SetupCore(mw.coreV1)
 }

@@ -16,8 +16,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// ITransactionCore defines the methods for core business logic for transaction operations.
+// ITransactionCore defines the methods interface for core business logic for transaction operations.
 type ITransactionCore interface {
+
 	// CreateTransaction creates a new transaction record in the db
 	CreateTransaction(transactionPayload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error)
 
@@ -26,7 +27,6 @@ type ITransactionCore interface {
 	FinalTransactionAmount(amount float64, operationTypeID int, tx *gorm.DB) (float64, error)
 
 	// CheckAccountIdExist verifies whether the provided accountId exists by calling the account service.
-	// Returns an error if the account is not found.
 	CheckAccountIdExist(accountId int, tx *gorm.DB) error
 }
 
@@ -38,7 +38,7 @@ type TransactionCore struct {
 	accountClient   accountClientPackageV1.IAccountClient
 }
 
-// NewTransactionCore return new TransactionCore instance.
+// NewTransactionCore creates and return new TransactionCore instance.
 func NewTransactionCore(repoV1 repoV1Package.ITransactionRepository, logger *logrus.Logger, operationClient operationClientPackageV1.IOperationClient, accountClient accountClientPackageV1.IAccountClient) *TransactionCore {
 	return &TransactionCore{repoV1: repoV1, logger: logger, operationClient: operationClient, accountClient: accountClient}
 }
@@ -69,7 +69,7 @@ func (core *TransactionCore) FinalTransactionAmount(amount float64, operationTyp
 	return (math.Abs(amount) * float64(coef)), nil
 }
 
-// CheckAccountIdExist verifies that the provided accountId exists in the account service.
+// CheckAccountIdExist verifies that the provided accountId exists in the db.
 // Steps:
 //  1. Calls the account service to retrieve an account by account id.
 //  2. If no account is found (ID == 0) in db, returns an Error.
@@ -97,18 +97,18 @@ func (core *TransactionCore) CheckAccountIdExist(accountId int, tx *gorm.DB) err
 // calculating the final amount.
 //
 // Steps:
-//   1. Ensure the account ID is valid via CheckAccountIdExist. If invalid, return an error.
-//   2. Map the incoming payload to a database transaction entity.
+//   1. Ensure the account ID is valid. If invalid, return an error.
+//   2. Map the incoming payload to a db transaction entity.
 //   3. Calculate the final transaction amount using FinalTransactionAmount.
 //   4. Persist the transaction in the DB
 //
 // Parameters:
-//   - transactionPayload: Payload containing the base data needed to create a transaction (accountId, amount, etc.).
-//   - tx:                 The GORM transaction in which all DB operations will run.
+//   - transactionPayload: Payload containing the data needed to create a transaction (accountId, amount, etc.).
+//   - tx:                 db txn.
 //
 // Returns:
 //   - A pointer to the newly created Transaction entity.
-//   - An error if account validation fails, amount calculation fails, or the DB create operation fails.
+//   - An encountered Error.
 
 func (core *TransactionCore) CreateTransaction(transactionPayload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error) {
 	core.logger.Info("CreateTransaction method called in transaction core layer.")
