@@ -29,6 +29,7 @@ Project employs a microservices architecture, primarily developed in Go, to ensu
     - Transaction Service: Handles transaction-related data.
     - Operation Service: Manages operation types.
     - Mediator Service: Acts as an intermediary to facilitate communication between services via Mediator Pattern.
+    
     Each service is designed to be independent, promoting scalability and ease of maintenance.
 
 
