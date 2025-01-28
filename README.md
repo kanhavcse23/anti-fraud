@@ -1,15 +1,15 @@
 Project employs a microservices architecture, primarily developed in Go, to ensure scalability, maintainability, and efficient handling of various components.
 
-Table of Contents:
-- Project Overview
-- Features
-- Architecture
-- Installation
-- Usage
-- Configuration
-- Testing
-- Contributing
-- License
+- Table of Contents:
+    - Project Overview
+    - Features
+    - Architecture
+    - Installation
+    - Usage
+    - Configuration
+    - Testing
+    - Contributing
+    - License
 
 
 - Project Overview:
