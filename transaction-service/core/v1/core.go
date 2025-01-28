@@ -16,7 +16,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// ITransactionCore defines the methods interface for core business logic for transaction operations.
+// ITransactionCore defines the methods interface for core business logic for transaction.
 type ITransactionCore interface {
 
 	// CreateTransaction creates a new transaction record in the db
@@ -30,7 +30,7 @@ type ITransactionCore interface {
 	CheckAccountIdExist(accountId int, tx *gorm.DB) error
 }
 
-// TransactionCore implements ITransactionCore.
+// TransactionCore implements ITransactionCore interface.
 type TransactionCore struct {
 	repoV1          repoV1Package.ITransactionRepository
 	logger          *logrus.Logger
@@ -48,7 +48,7 @@ func NewTransactionCore(repoV1 repoV1Package.ITransactionRepository, logger *log
 // Steps:
 //  1. Retrieve the coefficient from the operation service using the provided operationTypeID.
 //  2. Convert the original amount to its absolute value and multiply by the coefficient.
-//  3. Return the computed final amount or the original amount plus an error if an external call fails.
+//  3. Return the computed final amount or the original amount and an encountered Error.
 //
 // Parameters:
 //   - amount: The initial transaction amount.
@@ -98,9 +98,8 @@ func (core *TransactionCore) CheckAccountIdExist(accountId int, tx *gorm.DB) err
 //
 // Steps:
 //   1. Ensure the account ID is valid. If invalid, return an error.
-//   2. Map the incoming payload to a db transaction entity.
-//   3. Calculate the final transaction amount using FinalTransactionAmount.
-//   4. Persist the transaction in the DB
+//   2. Calculate the final transaction amount using FinalTransactionAmount.
+//   3. Persist the transaction in the DB
 //
 // Parameters:
 //   - transactionPayload: Payload containing the data needed to create a transaction (accountId, amount, etc.).

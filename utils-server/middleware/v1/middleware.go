@@ -14,6 +14,7 @@ func NewMiddlewareHandler(logger *logrus.Logger) *MiddlewareHandler {
 	return &MiddlewareHandler{logger: logger}
 }
 
+// wrapper func to handle error for HTTP methods
 func (middlewareHandler *MiddlewareHandler) MiddlewareHandlerFunc(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {

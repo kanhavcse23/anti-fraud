@@ -26,6 +26,7 @@ var (
 	configFile = "config.yml"
 )
 
+// Load config from config.yml file.
 func LoadConfig() (*Config, error) {
 	file, err := os.Open(configFile)
 	if err != nil {

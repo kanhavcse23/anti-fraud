@@ -15,6 +15,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// TransactionManager wires all components required to run transaction-service.
 type TransactionManager struct {
 	db              *gorm.DB
 	router          *mux.Router
@@ -23,11 +24,13 @@ type TransactionManager struct {
 	accountClient   accountClientV1Package.IAccountClient
 }
 
+// NewTransactionManager create and return new instance of TransactionManager.
 func NewTransactionManager(db *gorm.DB, router *mux.Router, logger *logrus.Logger, operationClient operationClientV1Package.IOperationClient, accountClient accountClientV1Package.IAccountClient) *TransactionManager {
 
 	return &TransactionManager{db: db, router: router, logger: logger, operationClient: operationClient, accountClient: accountClient}
 }
 
+// Init wire all components, register routes for transaction-service.
 func (mw *TransactionManager) Init() {
 
 	middlewareHandler := middlewareHandlerPackageV1.NewMiddlewareHandler(mw.logger)

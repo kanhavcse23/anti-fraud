@@ -8,14 +8,14 @@ import (
 	"gorm.io/gorm"
 )
 
-// ITransactionRepository defines method interface for performing operations related to transactions in the db.
+// ITransactionRepository defines methods interface for performing operations in the db.
 type ITransactionRepository interface {
 
 	// CreateTransaction persists a Transaction entity to the db.
 	CreateTransaction(transaction *entityDbV1Package.Transaction, tx *gorm.DB) error
 }
 
-// TransactionRepository implements the ITransactionRepository interface,
+// TransactionRepository implements the ITransactionRepository interface.
 type TransactionRepository struct {
 	logger *logrus.Logger
 }
@@ -37,7 +37,7 @@ func NewTransactionRepository(logger *logrus.Logger) *TransactionRepository {
 //   - tx:          db txn.
 //
 // Returns:
-//   - error: If the record fails to insert. else return nil.
+//   - error: an encountered Error. else return nil.
 func (repo *TransactionRepository) CreateTransaction(transaction *entityDbV1Package.Transaction, tx *gorm.DB) error {
 	repo.logger.Info("CreateTransaction method called in transaction repo layer.")
 	result := tx.Table(constantPackage.TABLE_NAME).Create(transaction)

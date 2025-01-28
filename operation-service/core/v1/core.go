@@ -7,21 +7,20 @@ import (
 	"gorm.io/gorm"
 )
 
-// IOperationCore defines the core interface for operation-related business logic.
+// IOperationCore defines the methods interface for operation-related core business logic.
 type IOperationCore interface {
 
 	// GetOperationCoefficient returns the coefficient for a given operation ID.
-	// If the operation does not exist or a repository error occurs, returns an error.
 	GetOperationCoefficient(operationId int, tx *gorm.DB) (int, error)
 }
 
-// OperationCore implements IOperationCore
+// OperationCore implements IOperationCore interface.
 type OperationCore struct {
 	repoV1 repoV1Package.IOperationRepository
 	logger *logrus.Logger
 }
 
-// NewOperationCore return new OperationCore instance.
+// NewOperationCore creates and return new OperationCore instance.
 func NewOperationCore(repoV1 repoV1Package.IOperationRepository, logger *logrus.Logger) *OperationCore {
 	return &OperationCore{repoV1: repoV1, logger: logger}
 }
@@ -38,7 +37,7 @@ func NewOperationCore(repoV1 repoV1Package.IOperationRepository, logger *logrus.
 //   - tx:          db txn.
 //
 // Returns:
-//   - int:   The coefficient associated with the operation (+1 / -1). +1 for credit txn, -1 for debit txn.
+//   - int:   The coefficient associated with the operation type.
 //   - error: an encountered Error.
 func (core *OperationCore) GetOperationCoefficient(operationId int, tx *gorm.DB) (int, error) {
 	core.logger.Info("GetOperationCoefficient method called in operation core layer.")

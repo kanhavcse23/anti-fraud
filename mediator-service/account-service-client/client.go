@@ -34,11 +34,10 @@ func (client *AccountClient) SetupCore(accountCoreV1 coreV1Package.IAccountCore)
 	client.accountCoreV1 = accountCoreV1
 }
 
-// GetAccount calls the core's GetAccount method and transforms the returned DB entity
-// into a mediator-level Account struct.
+// GetAccount calls the core's GetAccount method to get account data.
 //
 // Steps:
-//  1. Invoke the accountCoreV1.GetAccount to fetch the account record.
+//  1. Invoke the accountCoreV1.GetAccount to fetch the account record from account-service.
 //  2. If an error occurs, return an empty Account struct and the error.
 //  3. Otherwise, map the fetched account to a mediator-level Account struct.
 //

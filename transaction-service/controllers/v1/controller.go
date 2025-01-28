@@ -21,7 +21,7 @@ type ITransactionController interface {
 	CreateTransaction(w http.ResponseWriter, r *http.Request)
 }
 
-// TransactionController implements ITransactionController.
+// TransactionController implements ITransactionController interface.
 type TransactionController struct {
 	repoV1 repoV1Package.ITransactionRepository
 	coreV1 coreV1Package.ITransactionCore
