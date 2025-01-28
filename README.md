@@ -33,15 +33,18 @@ Project employs a microservices architecture, primarily developed in Go, to ensu
     Each service is designed to be independent, promoting scalability and ease of maintenance.
 
 
-- Automate Installation via run.sh:
+- Automate Installation via run_linux.sh/run_macos.sh:
     - Prerequisites:
-        - Linux (Ubuntu)
         - Ensure that your postgresql database is set up and accessible.
     - Build and Run Services:
         - "git clone https://github.com/kanhavcse23/anti-fraud.git" (Clone the Repository)
         - "cd anti-fraud"
-        - "chmod +x run.sh"
-        - "source run.sh"
+        - For Linux OS:
+            - "chmod +x run_linux.sh"
+            - "source run_linux.sh"
+        - For MacOS OS:
+            - "chmod +x run_macos.sh"
+            - "source run_macos.sh"
 
 - Manual Installation:
     - To set up the Project System locally, follow these steps:
