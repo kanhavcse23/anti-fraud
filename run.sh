@@ -1,6 +1,6 @@
 #!/bin/bash
-python3 -m venv rishavenv
-source rishavenv/bin/activate
+python3 -m venv env
+source env/bin/activate
 
 sudo apt update
 sudo apt install -y ca-certificates curl gnupg
