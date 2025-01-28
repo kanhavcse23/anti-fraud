@@ -60,7 +60,7 @@ func (controller *TransactionController) CreateTransaction(w http.ResponseWriter
 		return
 	}
 
-	logger.Infof("CreateTransaction endpoint called input payload: %v", transactionReq)
+	logger.WithField("input payload", transactionReq).Info("CreateTransaction endpoint called.")
 
 	// 2. Validate payload.
 	err = transactionReq.Validate()

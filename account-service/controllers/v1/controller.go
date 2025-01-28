@@ -73,7 +73,7 @@ func (controller *AccountController) CreateAccount(w http.ResponseWriter, r *htt
 		return
 	}
 
-	logger.Infof("CreateAccount endpoint called input payload: %v", accountReq)
+	logger.WithField("input payload", accountReq).Info("CreateAccount endpoint called.")
 
 	// 2. Validate HTTP input payload.
 	err = accountReq.Validate()
