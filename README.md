@@ -12,17 +12,17 @@ Table of Contents:
 - Contributing
 - License
 
--Project Overview:
+- Project Overview:
     This project consists of multiple services, each responsible for specific functionalities such as account management, transaction processing, and operation handling.
 
--Features:
-    -Account Management: Handles creation and retrieval of account details.
-    -Transaction Management: Manages the creation and validation of financial transactions.
-    -Operation Handling: Manages different operation types.
-    -Mediator Service: Facilitates communication between different services to ensure a decoupled architecture.
-    -Database Migrations: Includes scripts for setting up and migrating the database schema.
+- Features:
+    - Account Management: Handles creation and retrieval of account details.
+    - Transaction Management: Manages the creation and validation of financial transactions.
+    - Operation Handling: Manages different operation types.
+    - Mediator Service: Facilitates communication between different services to ensure a decoupled architecture.
+    - Database Migrations: Includes scripts for setting up and migrating the database schema.
 
--Architecture:
+- Architecture:
     The system follows a microservices architecture with the following components:
 
     - Account Service: Manages account-related data.
@@ -32,18 +32,18 @@ Table of Contents:
     Each service is designed to be independent, promoting scalability and ease of maintenance.
 
 
--Automate Installation via run.sh:
-    -Prerequisites:
+- Automate Installation via run.sh:
+    - Prerequisites:
         - Linux (Ubuntu)
         - Run Database Migrations:
             Ensure that your postgresql database is set up and accessible.
-    -Build and Run Services:
+    - Build and Run Services:
         - "git clone https://github.com/kanhavcse23/anti-fraud.git" (Clone the Repository)
         - "cd anti-fraud"
         - "chmod +x run.sh"
         - "source run.sh"
 
--Manual Installation:
+- Manual Installation:
     To set up the Project System locally, follow these steps:
 
     Clone the Repository:
@@ -59,7 +59,7 @@ Table of Contents:
     Build and Run Services:
         "docker-compose up --build"
 
--Usage:
+- Usage:
     Once all services are up and running, you can interact with them using API clients like Postman.
 
     Account Service:
@@ -69,11 +69,11 @@ Table of Contents:
     Transaction Service:
     - Create Transaction: POST /transactions, JSON BODY: {"account_id": <ACC_ID>, "operation_type_id": <OP_ID>, "amount": <AMOUNT>}
 
--Testing:
+- Testing:
     To run tests for the services, use the following command:
         - "go test ./... -v"
 
--Database Configuration:
+- Database Configuration:
     Edit database configuration in following files:
     - config.yml
     - Dockerfile
