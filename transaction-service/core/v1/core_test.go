@@ -17,11 +17,6 @@ import (
 	"gorm.io/gorm"
 )
 
-//-------------------------------------------//
-// 1. Mocks for Dependencies
-//-------------------------------------------//
-
-// Mock for ITransactionRepository
 type MockTransactionRepository struct {
 	mock.Mock
 }
@@ -31,24 +26,19 @@ func (m *MockTransactionRepository) CreateTransaction(transaction *entityDbV1Pac
 	return args.Error(0)
 }
 
-// Mock for IOperationClient
 type MockOperationClient struct {
 	mock.Mock
 }
 
 func (m *MockOperationClient) GetOperationCoefficient(operationTypeID int, tx *gorm.DB) (int, error) {
 	args := m.Called(operationTypeID, tx)
-	// cast result to `int`, not `float64`
 	coef, _ := args.Get(0).(int)
 	return coef, args.Error(1)
 }
 func (m *MockOperationClient) SetupCore(core opsCoreV1Package.IOperationCore) {
-	// If the real method returns nothing, do the same here
-	// If it returns error, you must match that too
 	m.Called(core)
 }
 
-// Mock for IAccountClient
 type MockAccountClient struct {
 	mock.Mock
 }
@@ -59,10 +49,7 @@ func (m *MockAccountClient) GetAccount(accountId int, tx *gorm.DB) (*accountClie
 	return acc, args.Error(1)
 }
 
-// If your interface includes something like:
 func (m *MockAccountClient) SetupCore(core accountCoreV1Package.IAccountCore) {
-	// If the real method returns nothing, do the same here
-	// If it returns error, you must match that too
 	m.Called(core)
 }
 
@@ -70,7 +57,6 @@ func (m *MockAccountClient) SetupCore(core accountCoreV1Package.IAccountCore) {
 // 2. Setup Helpers
 //-------------------------------------------//
 
-// setupTestDB - creates an in-memory SQLite DB if needed
 func setupTestDB(t *testing.T) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	if err != nil {
@@ -100,11 +86,11 @@ func TestFinalTransactionAmount_Success(t *testing.T) {
 	core, _, opMock, _, db := setupTestCore(t)
 
 	opMock.On("GetOperationCoefficient", 1, mock.Anything).
-		Return(3, nil) // Suppose operation type #1 has a coef of 3
+		Return(3, nil)
 
 	amount, err := core.FinalTransactionAmount(100, 1, db)
 	assert.NoError(t, err)
-	assert.Equal(t, 300.0, amount) // 100 * 1.5
+	assert.Equal(t, 300.0, amount)
 
 	opMock.AssertExpectations(t)
 }
@@ -118,7 +104,7 @@ func TestFinalTransactionAmount_Error(t *testing.T) {
 	amount, err := core.FinalTransactionAmount(100, 2, db)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "operation client error")
-	assert.Equal(t, 100.0, amount) // returns the original amount on error
+	assert.Equal(t, 100.0, amount)
 
 	opMock.AssertExpectations(t)
 }
@@ -143,7 +129,7 @@ func TestCheckAccountIdExist_NotFound(t *testing.T) {
 	core, _, _, accMock, db := setupTestCore(t)
 
 	accMock.On("GetAccount", 456, mock.Anything).
-		Return(&accountClientPackageV1.Account{Id: 0}, nil) // i.e. not found
+		Return(&accountClientPackageV1.Account{Id: 0}, nil)
 
 	err := core.CheckAccountIdExist(456, db)
 	assert.Error(t, err)
@@ -178,19 +164,14 @@ func TestCreateTransaction_Success(t *testing.T) {
 		Amount:          1000.0,
 	}
 
-	// 1) CheckAccountIdExist => success
 	accMock.On("GetAccount", 111, mock.Anything).Return(&accountClientPackageV1.Account{Id: 111}, nil)
 
-	// 2) FinalTransactionAmount => success
 	opMock.On("GetOperationCoefficient", 2, mock.Anything).Return(1, nil)
 
-	// 3) CreateTransaction => success
 	repoMock.On("CreateTransaction", mock.Anything, mock.Anything).
 		Return(nil).
 		Run(func(args mock.Arguments) {
-			// Optional: you can inspect the transaction if you want
 			tr := args.Get(0).(*entityDbV1Package.Transaction)
-			// e.g. check that the final amount is set to 1000*1
 			assert.Equal(t, 1000.0, tr.Amount, "expected final transaction amount to be 1000")
 			assert.Equal(t, 2, tr.OperationTypeId)
 			assert.Equal(t, 111, tr.AccountId)
@@ -218,7 +199,6 @@ func TestCreateTransaction_AccountNotFound(t *testing.T) {
 		Amount:          100.0,
 	}
 
-	// CheckAccountIdExist => not found
 	accMock.On("GetAccount", 999, mock.Anything).
 		Return(&accountClientPackageV1.Account{Id: 0}, nil)
 
@@ -230,7 +210,6 @@ func TestCreateTransaction_AccountNotFound(t *testing.T) {
 	assert.Contains(t, err.Error(), "account_id: 999 not found")
 	assert.Equal(t, 0.0, transaction.Amount, "expect zero transaction returned or partial data")
 
-	// The repo CreateTransaction should not be called
 	repoMock.AssertNotCalled(t, "CreateTransaction", mock.Anything, mock.Anything)
 
 	accMock.AssertExpectations(t)
@@ -248,7 +227,6 @@ func TestCreateTransaction_FinalAmountError(t *testing.T) {
 	accMock.On("GetAccount", 222, mock.Anything).
 		Return(&accountClientPackageV1.Account{Id: 222}, nil)
 
-	// FinalTransactionAmount => error
 	opMock.On("GetOperationCoefficient", 3, mock.Anything).
 		Return(0.0, errors.New("coef error"))
 
@@ -259,7 +237,6 @@ func TestCreateTransaction_FinalAmountError(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "coef error")
 
-	// The repo CreateTransaction should not be called
 	repoMock.AssertNotCalled(t, "CreateTransaction", mock.Anything, mock.Anything)
 
 	accMock.AssertExpectations(t)

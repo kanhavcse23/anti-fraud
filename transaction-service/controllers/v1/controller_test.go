@@ -29,7 +29,6 @@ type MockTransactionCore struct {
 
 func (m *MockTransactionCore) CreateTransaction(payload *entityCoreV1Package.CreateTransactionPayload, tx *gorm.DB) (*entityDbV1Package.Transaction, error) {
 	args := m.Called(payload, tx)
-	// Extract result from mock arguments
 	transaction, _ := args.Get(0).(*entityDbV1Package.Transaction)
 	return transaction, args.Error(1)
 }
@@ -44,10 +43,6 @@ func (m *MockTransactionCore) CheckAccountIdExist(accountId int, tx *gorm.DB) er
 	return args.Error(0)
 }
 
-//---------------------------------------------//
-// Optional: Setup an in-memory DB if needed
-//---------------------------------------------//
-
 func setupTestDB(t *testing.T) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	if err != nil {
@@ -60,14 +55,13 @@ func setupTestDB(t *testing.T) *gorm.DB {
 // Test Helpers
 //----------------------------------------------//
 
-// setupTestController creates a TransactionController with a mocked core and a test DB
 func setupTestController(t *testing.T) (*TransactionController, *MockTransactionCore, *gorm.DB) {
 	logger := logrus.New()
 	db := setupTestDB(t)
 	mockCore := new(MockTransactionCore)
 
 	controller := NewTransactionController(
-		nil, // We are not directly calling the repo from the controller
+		nil,
 		mockCore,
 		db,
 		logger,
@@ -83,7 +77,6 @@ func setupTestController(t *testing.T) (*TransactionController, *MockTransaction
 func TestCreateTransaction_Success(t *testing.T) {
 	controller, mockCore, _ := setupTestController(t)
 
-	// Prepare a valid HTTP request body
 	validPayload := entityHttpV1Package.CreateTransactionRequest{
 		AccountId:       123,
 		OperationTypeId: 1,
@@ -95,11 +88,10 @@ func TestCreateTransaction_Success(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	rr := httptest.NewRecorder()
 
-	// Mock the core to return a successful Transaction
 	mockCore.On(
 		"CreateTransaction",
-		mock.Anything, // or simply mock.Anything
-		mock.Anything, // The *gorm.DB
+		mock.Anything,
+		mock.Anything,
 	).Return(&entityDbV1Package.Transaction{
 		Model:           gorm.Model{ID: 1},
 		AccountId:       123,
@@ -107,10 +99,8 @@ func TestCreateTransaction_Success(t *testing.T) {
 		Amount:          200.0,
 	}, nil)
 
-	// Act
 	controller.CreateTransaction(rr, req)
 
-	// Assert
 	assert.Equal(t, http.StatusOK, rr.Code)
 	assert.Contains(t, rr.Body.String(), `"success":true`)
 	assert.Contains(t, rr.Body.String(), `"amount":200`)
@@ -125,7 +115,6 @@ func TestCreateTransaction_Success(t *testing.T) {
 func TestCreateTransaction_BadJSON(t *testing.T) {
 	controller, mockCore, _ := setupTestController(t)
 
-	// Invalid JSON structure
 	req := httptest.NewRequest(http.MethodPost, "/transactions/v1", bytes.NewReader([]byte(`{invalid-json`)))
 	req.Header.Set("Content-Type", "application/json")
 	rr := httptest.NewRecorder()
@@ -135,7 +124,6 @@ func TestCreateTransaction_BadJSON(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, rr.Code)
 	assert.Contains(t, rr.Body.String(), "Error decoding request body")
 
-	// The core should never be called on bad JSON
 	mockCore.AssertNotCalled(t, "CreateTransaction", mock.Anything, mock.Anything)
 }
 
@@ -146,11 +134,9 @@ func TestCreateTransaction_BadJSON(t *testing.T) {
 func TestCreateTransaction_ValidationError(t *testing.T) {
 	controller, mockCore, _ := setupTestController(t)
 
-	// Suppose our request Validate() fails if OperationTypeID = 0
 	payload := entityHttpV1Package.CreateTransactionRequest{
 		AccountId: 123,
 		Amount:    1000.0,
-		// OperationTypeID is missing or zero => cause validation error
 	}
 	bodyBytes, _ := json.Marshal(payload)
 
@@ -158,10 +144,8 @@ func TestCreateTransaction_ValidationError(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	rr := httptest.NewRecorder()
 
-	// Act
 	controller.CreateTransaction(rr, req)
 
-	// Assert => 400 because Validate() fails
 	assert.Equal(t, http.StatusBadRequest, rr.Code)
 	assert.Contains(t, rr.Body.String(), "Error:")
 
@@ -214,23 +198,17 @@ func TestCreateTransaction_CommitError(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	rr := httptest.NewRecorder()
 
-	// Mock a successful CreateTransaction
 	mockCore.On("CreateTransaction", mock.Anything, mock.Anything).
 		Return(&entityDbV1Package.Transaction{Model: gorm.Model{ID: 1}, Amount: 500}, nil)
 
-	// Create a transaction and inject a commit error
 	tx := db.Begin()
-	defer tx.Rollback() // Ensure rollback in case of a panic during testing
-
+	defer tx.Rollback()
 	tx.AddError(errors.New("commit failed"))
 
-	// Replace the controller's DB with the mocked transaction
 	controller.db = tx
 
-	// Call the handler
 	controller.CreateTransaction(rr, req)
 
-	// Assert
 	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 	assert.Contains(t, rr.Body.String(), "commit failed")
 

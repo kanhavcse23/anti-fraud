@@ -1,4 +1,4 @@
-package mediator_ops_client_v1
+package mediator_account_client_v1
 
 type Account struct {
 	Id             int

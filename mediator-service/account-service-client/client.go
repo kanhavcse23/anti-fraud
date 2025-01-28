@@ -1,4 +1,4 @@
-package mediator_ops_client_v1
+package mediator_account_client_v1
 
 import (
 	coreV1Package "anti-fraud/account-service/core/v1"

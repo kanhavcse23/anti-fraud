@@ -13,42 +13,31 @@ import (
 	"gorm.io/gorm"
 )
 
-//-----------------//
-// Mock Repository //
-//-----------------//
-
 type MockAccountRepository struct {
 	mock.Mock
 }
 
-// CheckDuplicateAccount mock
 func (m *MockAccountRepository) CheckDuplicateAccount(documentNumber string, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	args := m.Called(documentNumber, tx)
 	account, _ := args.Get(0).(*entityDbV1Package.Account)
 	return account, args.Error(1)
 }
 
-// CreateAccount mock
 func (m *MockAccountRepository) CreateAccount(account *entityDbV1Package.Account, tx *gorm.DB) error {
 	args := m.Called(account, tx)
 	return args.Error(0)
 }
 
-// GetAccount mock
 func (m *MockAccountRepository) GetAccount(accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
 	args := m.Called(accountId, tx)
 	account, _ := args.Get(0).(*entityDbV1Package.Account)
 	return account, args.Error(1)
 }
 
-//------------------//
+// ------------------//
 // Utility Mappers  //
-//------------------//
-
-// If you need the actual mapper logic, you can mock or directly use the real function.
-// For example, we can assume mapperV1Package.AccountMapper just does a simple transform:
+// ------------------//
 func init() {
-
 }
 
 //---------------------//
@@ -71,12 +60,10 @@ func setupTest() (*MockAccountRepository, *AccountCore) {
 func TestCreateAccount_Success(t *testing.T) {
 	mockRepo, accountCore := setupTest()
 
-	// Define input payload
 	payload := &entityCoreV1Package.CreateAccountPayload{
 		DocumentNumber: "123456789",
 	}
 
-	// Mock repository calls
 	// 1. CheckDuplicateAccount -> returns nil account, no error
 	mockRepo.On("CheckDuplicateAccount", payload.DocumentNumber, mock.Anything).Return(&entityDbV1Package.Account{}, nil)
 	// 2. CreateAccount -> returns no error
@@ -98,7 +85,6 @@ func TestCreateAccount_DuplicateAccount(t *testing.T) {
 		DocumentNumber: "123456789",
 	}
 
-	// Simulate the account already existing
 	existingAccount := &entityDbV1Package.Account{
 		Model:          gorm.Model{ID: 1},
 		DocumentNumber: "123456789",
@@ -111,7 +97,7 @@ func TestCreateAccount_DuplicateAccount(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Duplicate account found")
 	assert.NotNil(t, account)
-	assert.Equal(t, existingAccount, account) // The core returns the found account
+	assert.Equal(t, existingAccount, account)
 
 	mockRepo.AssertExpectations(t)
 }
@@ -129,7 +115,7 @@ func TestCreateAccount_RepoError(t *testing.T) {
 	account, err := accountCore.CreateAccount(payload, &gorm.DB{})
 
 	assert.Error(t, err)
-	assert.Equal(t, 0, int(account.ID)) // or assert.Equal(t, &entityDbV1Package.Account{}, account) depending on your design
+	assert.Equal(t, 0, int(account.ID))
 
 	mockRepo.AssertExpectations(t)
 }

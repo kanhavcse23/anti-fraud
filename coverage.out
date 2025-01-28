@@ -1,0 +1,15 @@
+mode: set
+anti-fraud/operation-service/entity/db/v1/entities.go:15.37,17.2 1 0
+anti-fraud/operation-service/manager/v1/init.go:17.67,20.2 1 0
+anti-fraud/operation-service/manager/v1/init.go:22.36,25.2 2 0
+anti-fraud/operation-service/manager/v1/init.go:27.86,29.2 1 0
+anti-fraud/operation-service/core/v1/core.go:18.104,20.2 1 1
+anti-fraud/operation-service/core/v1/core.go:22.95,25.16 3 1
+anti-fraud/operation-service/core/v1/core.go:25.16,27.3 1 1
+anti-fraud/operation-service/core/v1/core.go:28.2,28.35 1 1
+anti-fraud/operation-service/entity/db/v1/entities.go:15.37,17.2 1 0
+anti-fraud/operation-service/entity/db/v1/entities.go:15.37,17.2 1 1
+anti-fraud/operation-service/repository/v1/repository.go:19.73,21.2 1 1
+anti-fraud/operation-service/repository/v1/repository.go:23.115,27.67 4 1
+anti-fraud/operation-service/repository/v1/repository.go:27.67,29.3 1 1
+anti-fraud/operation-service/repository/v1/repository.go:30.2,30.33 1 1
