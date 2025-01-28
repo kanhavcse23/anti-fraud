@@ -45,10 +45,10 @@ func NewAccountRepository(logger *logrus.Logger) *AccountRepository {
 // Returns:
 //   - An error if the insert fails, otherwise nil.
 func (repo *AccountRepository) CreateAccount(logger *logrus.Entry, account *entityDbV1Package.Account, tx *gorm.DB) error {
-	repo.logger.Info("CreateAccount method called in account repo layer.")
+	logger.Info("CreateAccount method called in account repo layer.")
 	result := tx.Table(constantPackage.TABLE_NAME).Create(account)
 	if result.Error != nil {
-		repo.logger.Errorf("Failed to create account: %v", result.Error)
+		logger.Errorf("Failed to create account: %v", result.Error)
 	}
 	return result.Error
 }
@@ -68,14 +68,14 @@ func (repo *AccountRepository) CreateAccount(logger *logrus.Entry, account *enti
 //   - db entity account.
 //   - Encountered Error.
 func (repo *AccountRepository) GetAccount(logger *logrus.Entry, accountId int, tx *gorm.DB) (*entityDbV1Package.Account, error) {
-	repo.logger.Info("GetAccount method called in account repo layer.")
+	logger.Info("GetAccount method called in account repo layer.")
 	var account entityDbV1Package.Account
 	result := tx.Table(constantPackage.TABLE_NAME).First(&account, accountId)
 	if result.Error != nil && result.Error == gorm.ErrRecordNotFound {
-		repo.logger.Errorf("Failed to find account with accountId: %d", accountId)
+		logger.Errorf("Failed to find account with accountId: %d", accountId)
 		return &account, nil
 	} else if result.Error != nil {
-		repo.logger.Errorf("Error occured while running GET query on db: %s", result.Error.Error())
+		logger.Errorf("Error occured while running GET query on db: %s", result.Error.Error())
 	}
 	return &account, result.Error
 }
