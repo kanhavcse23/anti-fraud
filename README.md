@@ -53,7 +53,7 @@ Project employs a microservices architecture, primarily developed in Go, to ensu
         - For Linux OS:
             - "chmod +x run_linux.sh"
             - "source run_linux.sh"
-        - For MacOS OS:
+        - For Mac OS:
             - "chmod +x run_macos.sh"
             - "source run_macos.sh"
 
