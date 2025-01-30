@@ -61,7 +61,7 @@ func TestCreateAccount_Success(t *testing.T) {
 	mockCore := new(MockAccountCore)
 	controller := NewAccountController(nil, mockCore, db, logger)
 
-	mockCore.On("CreateAccount", mock.Anything, mock.Anything).
+	mockCore.On("CreateAccount", mock.Anything, mock.Anything, mock.Anything).
 		Return(&entityDbV1Package.Account{
 			Model:          gorm.Model{ID: 1},
 			DocumentNumber: "123456789",

@@ -34,12 +34,6 @@ func (m *MockAccountRepository) GetAccount(logger *logrus.Entry, accountId int, 
 	return account, args.Error(1)
 }
 
-// ------------------//
-// Utility Mappers  //
-// ------------------//
-func init() {
-}
-
 //---------------------//
 //   Unit Test Setup   //
 //---------------------//
